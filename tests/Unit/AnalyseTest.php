@@ -79,3 +79,9 @@ it('handles multiple properties with different types', function () {
 
     expect($result['exitCode'])->toBe(0);
 });
+
+it('resolves use imports in inferred types', function () {
+    $result = analyseFixture('UseMapInference.php');
+
+    expect($result['exitCode'])->toBe(0);
+});

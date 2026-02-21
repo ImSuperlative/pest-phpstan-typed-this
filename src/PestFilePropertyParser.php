@@ -8,6 +8,8 @@ use PhpParser\Node\Expr\PropertyFetch;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Stmt\Use_;
 use PhpParser\NodeFinder;
+use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\ParserFactory;
 use PHPStan\Analyser\NameScope;
 use PHPStan\PhpDoc\PhpDocStringResolver;
@@ -56,6 +58,11 @@ final class PestFilePropertyParser
         if ($stmts === null) {
             return $this->cache[$filePath] = [];
         }
+
+        $traverser = new NodeTraverser;
+        $traverser->addVisitor(new NameResolver);
+        /** @var Node\Stmt[] $stmts */
+        $stmts = $traverser->traverse($stmts);
 
         $useMap = self::buildUseMap($stmts);
         $properties = [];
