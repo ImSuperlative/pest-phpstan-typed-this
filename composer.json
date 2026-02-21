@@ -1,0 +1,43 @@
+{
+    "name": "imsuperlative/pest-phpstan-typed-this",
+    "description": "PHPStan extension that types $this in Pest PHP test closures",
+    "type": "phpstan-extension",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2",
+        "phpstan/phpstan": "^2.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.27",
+        "orchestra/testbench": "^10.0",
+        "pestphp/pest": "^4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "ImSuperlative\\PestPhpstanTypedThis\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ImSuperlative\\PestPhpstanTypedThis\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "phpstan": "vendor/bin/phpstan --configuration=phpstan.neon.dist"
+    },
+    "extra": {
+        "phpstan": {
+            "includes": [
+                "extension.neon"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

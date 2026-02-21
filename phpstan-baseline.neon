@@ -1,0 +1,13 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Cannot call method count\(\) on string\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: tests/Fixtures/TypeMismatch.php
+
+		-
+			message: '#^Access to an undefined property PHPUnit\\Framework\\TestCase\:\:\$nonExistent\.$#'
+			identifier: property.notFound
+			count: 1
+			path: tests/Fixtures/UndefinedProperty.php

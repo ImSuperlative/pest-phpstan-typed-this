@@ -1,0 +1,22 @@
+parametersSchema:
+    pestPhpstanTypedThis: structure([
+        testCaseClass: string()
+    ])
+
+parameters:
+    pestPhpstanTypedThis:
+        testCaseClass: PHPUnit\Framework\TestCase
+
+    universalObjectCratesClasses:
+        - Pest\Mixins\Expectation
+
+services:
+    -
+        class: ImSuperlative\PestPhpstanTypedThis\PestFilePropertyParser
+
+    -
+        class: ImSuperlative\PestPhpstanTypedThis\PestTypedClosureThisExtension
+        arguments:
+            testCaseClass: %pestPhpstanTypedThis.testCaseClass%
+        tags:
+            - phpstan.functionParameterClosureThisExtension
