@@ -4,6 +4,7 @@ namespace ImSuperlative\PestPhpstanTypedThis;
 
 use PHPStan\Reflection\ClassMemberAccessAnswerer;
 use PHPStan\Reflection\Type\CallbackUnresolvedPropertyPrototypeReflection;
+use PHPStan\Reflection\Type\UnresolvedMethodPrototypeReflection;
 use PHPStan\Reflection\Type\UnresolvedPropertyPrototypeReflection;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\ObjectType;
@@ -83,6 +84,21 @@ final class PestTestCaseType extends ObjectType
         }
 
         return parent::getUnresolvedInstancePropertyPrototype($propertyName, $scope);
+    }
+
+    /**
+     * Override method resolution to make all methods accessible (public).
+     *
+     * In Pest closures, $this is bound to the TestCase instance,
+     * so protected/private methods should be callable.
+     */
+    public function getUnresolvedMethodPrototype(
+        string $methodName,
+        ClassMemberAccessAnswerer $scope,
+    ): UnresolvedMethodPrototypeReflection {
+        $prototype = parent::getUnresolvedMethodPrototype($methodName, $scope);
+
+        return new PestPublicUnresolvedMethodPrototype($prototype);
     }
 
     private function buildPropertyPrototype(string $propertyName): UnresolvedPropertyPrototypeReflection

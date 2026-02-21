@@ -20,3 +20,8 @@ services:
             testCaseClass: %pestPhpstanTypedThis.testCaseClass%
         tags:
             - phpstan.functionParameterClosureThisExtension
+
+    -
+        class: ImSuperlative\PestPhpstanTypedThis\PestExpectationMethodExtension
+        tags:
+            - phpstan.broker.methodsClassReflectionExtension
