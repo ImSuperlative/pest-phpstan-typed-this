@@ -74,6 +74,79 @@ parameters:
         testCaseClass: Tests\TestCase
 ```
 
+## What it solves
+
+### Typed dynamic properties
+
+```php
+<?php
+
+use App\Models\User;
+
+/**
+ * @property User $user
+ */
+
+beforeEach(function () {
+    $this->user = User::factory()->create();
+});
+
+it('has a name', function () {
+    // PHPStan knows $this->user is User
+    expect($this->user->name)->toBeString();
+});
+```
+
+### Protected TestCase methods
+
+Protected methods like `mock()`, `assertDatabaseHas()`, etc. are accessible in Pest closures:
+
+```php
+<?php
+
+use App\Services\PaymentService;
+
+beforeEach(function () {
+    $this->mock(PaymentService::class)->shouldIgnoreMissing();
+});
+
+it('asserts database state', function () {
+    $this->assertDatabaseHas('users', ['email' => 'test@example.com']);
+    $this->assertDatabaseCount('users', 1);
+    $this->assertDatabaseMissing('users', ['email' => 'ghost@example.com']);
+});
+```
+
+### Higher-order expectation proxying
+
+Pest proxies method calls on `expect()` to the underlying value via `__call`. This extension tells PHPStan these are valid:
+
+```php
+<?php
+
+it('proxies collection methods', function () {
+    $items = collect([1, 2, 3]);
+
+    expect($items)->first()->toBe(1);
+    expect($items)->pluck('name')->toHaveCount(3);
+    expect($items)->where('active', true)->toHaveCount(1);
+    expect($items)->every(fn (int $item) => $item > 0)->toBeTrue();
+});
+```
+
+### Custom expectations
+
+Custom expectations registered via `expect()->extend()` are also supported:
+
+```php
+<?php
+
+it('uses custom expectations', function () {
+    $collection = collect([1, 2, 3]);
+    expect($collection)->toBeCollection()->toHaveCount(3);
+});
+```
+
 ## Supported Pest functions
 
 `it`, `test`, `describe`, `beforeEach`, `afterEach`, `beforeAll`, `afterAll` (both short and `Pest\` namespaced forms).
