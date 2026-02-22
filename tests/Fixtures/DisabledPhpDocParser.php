@@ -3,7 +3,7 @@
 use Illuminate\Support\Collection;
 
 /**
- * @property declares ?Collection (nullable), but assignment infers Collection (non-null).
+ * @-property declares ?Collection (nullable), but assignment infers Collection (non-null).
  * When parsePhpDocProperties is disabled, inference wins and count() works directly.
  * When enabled, the nullable annotation would require a null check.
  *
