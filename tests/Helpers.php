@@ -7,10 +7,10 @@ use Symfony\Component\Process\Process;
  *
  * @return array{exitCode: int, output: string, errors: array<string, mixed>}
  */
-function analyseFixture(string $fixture): array
+function analyseFixture(string $fixture, string $config = 'phpstan-test.neon'): array
 {
     $fixturePath = __DIR__.'/Fixtures/'.$fixture;
-    $configPath = __DIR__.'/phpstan-test.neon';
+    $configPath = __DIR__.'/'.$config;
     $phpstanBin = dirname(__DIR__).'/vendor/bin/phpstan';
 
     $process = new Process([$phpstanBin, 'analyse', '--no-progress', '--error-format=json', '--configuration='.$configPath, $fixturePath]);

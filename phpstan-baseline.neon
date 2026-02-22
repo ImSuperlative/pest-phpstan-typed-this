@@ -1,13 +1,85 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Cannot call method count\(\) on string\.$#'
-			identifier: method.nonObject
+			message: '#^Calling PHPStan\\PhpDoc\\PhpDocStringResolver\:\:resolve\(\) is not covered by backward compatibility promise\. The method might change in a minor PHPStan version\.$#'
+			identifier: phpstanApi.method
 			count: 1
-			path: tests/Fixtures/TypeMismatch.php
+			path: src/Parser/PestPropertyTagParser.php
 
 		-
-			message: '#^Access to an undefined property PHPUnit\\Framework\\TestCase\:\:\$nonExistent\.$#'
-			identifier: property.notFound
+			message: '#^Calling PHPStan\\PhpDoc\\PhpDocStringResolver\:\:resolve\(\) is not covered by backward compatibility promise\. The method might change in a minor PHPStan version\.$#'
+			identifier: phpstanApi.method
 			count: 1
-			path: tests/Fixtures/UndefinedProperty.php
+			path: src/Parser/PhpDocPropertyParser.php
+
+		-
+			message: '#^Creating new PHPStan\\Reflection\\WrappedExtendedPropertyReflection is not covered by backward compatibility promise\. The class might change in a minor PHPStan version\.$#'
+			identifier: phpstanApi.constructor
+			count: 1
+			path: src/TypedThis/TestCaseType.php
+
+		-
+			message: '#^Implementing PHPStan\\Reflection\\ExtendedMethodReflection is not covered by backward compatibility promise\. The interface might change in a minor PHPStan version\.$#'
+			identifier: phpstanApi.interface
+			count: 1
+			path: src/Reflection/PestPublicExtendedMethodReflection.php
+
+		-
+			message: '#^Return type \(list\<PHPStan\\BetterReflection\\Reflection\\ReflectionAttribute\>\) of method ImSuperlative\\PestPhpstanTypedThis\\Reflection\\PestPublicExtendedMethodReflection\:\:getAttributes\(\) should be compatible with return type \(list\<PHPStan\\Reflection\\AttributeReflection\>\) of method PHPStan\\Reflection\\ExtendedMethodReflection\:\:getAttributes\(\)$#'
+			identifier: method.childReturnType
+			count: 1
+			path: src/Reflection/PestPublicExtendedMethodReflection.php
+
+		-
+			message: '#^Method ImSuperlative\\PestPhpstanTypedThis\\Reflection\\PestPublicExtendedMethodReflection\:\:getAttributes\(\) should return list\<PHPStan\\BetterReflection\\Reflection\\ReflectionAttribute\> but returns list\<PHPStan\\Reflection\\AttributeReflection\>\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Reflection/PestPublicExtendedMethodReflection.php
+
+		-
+			message: '#^Method ImSuperlative\\PestPhpstanTypedThis\\Reflection\\PestPublicExtendedMethodReflection\:\:isAbstract\(\) should return PHPStan\\TrinaryLogic but returns bool\|PHPStan\\TrinaryLogic\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Reflection/PestPublicExtendedMethodReflection.php
+
+		-
+			message: '#^Method ImSuperlative\\PestPhpstanTypedThis\\Reflection\\PestPublicExtendedMethodReflection\:\:isBuiltin\(\) should return PHPStan\\TrinaryLogic but returns bool\|PHPStan\\TrinaryLogic\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Reflection/PestPublicExtendedMethodReflection.php
+
+		-
+			message: '#^Calling PHPStan\\Reflection\\Type\\UnresolvedMethodPrototypeReflection\:\:doNotResolveTemplateTypeMapToBounds\(\) is not covered by backward compatibility promise\. The method might change in a minor PHPStan version\.$#'
+			identifier: phpstanApi.method
+			count: 1
+			path: src/Reflection/PestPublicUnresolvedMethodPrototype.php
+
+		-
+			message: '#^Calling PHPStan\\Reflection\\Type\\UnresolvedMethodPrototypeReflection\:\:getNakedMethod\(\) is not covered by backward compatibility promise\. The method might change in a minor PHPStan version\.$#'
+			identifier: phpstanApi.method
+			count: 1
+			path: src/Reflection/PestPublicUnresolvedMethodPrototype.php
+
+		-
+			message: '#^Calling PHPStan\\Reflection\\Type\\UnresolvedMethodPrototypeReflection\:\:getTransformedMethod\(\) is not covered by backward compatibility promise\. The method might change in a minor PHPStan version\.$#'
+			identifier: phpstanApi.method
+			count: 1
+			path: src/Reflection/PestPublicUnresolvedMethodPrototype.php
+
+		-
+			message: '#^Calling PHPStan\\Reflection\\Type\\UnresolvedMethodPrototypeReflection\:\:withCalledOnType\(\) is not covered by backward compatibility promise\. The method might change in a minor PHPStan version\.$#'
+			identifier: phpstanApi.method
+			count: 1
+			path: src/Reflection/PestPublicUnresolvedMethodPrototype.php
+
+		-
+			message: '#^Implementing PHPStan\\Reflection\\Type\\UnresolvedMethodPrototypeReflection is not covered by backward compatibility promise\. The interface might change in a minor PHPStan version\.$#'
+			identifier: phpstanApi.interface
+			count: 1
+			path: src/Reflection/PestPublicUnresolvedMethodPrototype.php
+
+		-
+			message: '#^Implementing PHPStan\\Reflection\\Type\\UnresolvedPropertyPrototypeReflection is not covered by backward compatibility promise\. The interface might change in a minor PHPStan version\.$#'
+			identifier: phpstanApi.interface
+			count: 1
+			path: src/Reflection/PestUnresolvedPropertyPrototype.php

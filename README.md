@@ -4,6 +4,8 @@ PHPStan extension that provides typed `$this` in Pest PHP test closures.
 
 Solves the "undefined property" errors PHPStan reports when you assign dynamic properties to `$this` in `beforeEach` and use them in your tests.
 
+> ⚠️ **Note:** This extension uses some [unstable PHPStan APIs](#phpstan-api-compatibility) and may require updates on minor PHPStan releases.
+
 ## Requirements
 
 - PHP 8.2+
@@ -12,29 +14,29 @@ Solves the "undefined property" errors PHPStan reports when you assign dynamic p
 ## Installation
 
 ```bash
-composer require --dev local/pest-phpstan-typed-this
+composer require --dev imsuperlative/pest-phpstan-typed-this
 ```
 
 If you have `phpstan/extension-installer`, the extension is registered automatically. Otherwise, add it to your `phpstan.neon`:
 
 ```neon
 includes:
-    - vendor/local/pest-phpstan-typed-this/extension.neon
+    - vendor/imsuperlative/pest-phpstan-typed-this/extension.neon
 ```
 
 ## How it works
 
-The extension parses your Pest test files and picks up property types from two sources:
+The extension parses your Pest test files and picks up property types from two sources (**in precedence order**):
 
-### 1. `@property` annotations
+### 1. PHPDoc tags (default: disabled)
 
-Add `@property` PHPDoc tags at the top of your test file:
+`@pest-property` and `@property` tags at the top of your test file. `@pest-property` takes precedence over `@property`.
 
 ```php
 <?php
 
 /**
- * @property User $user
+ * @pest-property User $user
  * @property ?Team $team
  */
 
@@ -42,14 +44,9 @@ beforeEach(function () {
     $this->user = User::factory()->create();
     $this->team = null;
 });
-
-it('has a user', function () {
-    // PHPStan knows $this->user is User
-    expect($this->user->email)->toBeString();
-});
 ```
 
-### 2. Auto-inference from assignments
+### 2. Auto-inference from assignments (default: enabled)
 
 The extension infers types from `$this->prop = expr` assignments using PHPStan's own type resolver. Any expression PHPStan can resolve will work:
 
@@ -62,17 +59,20 @@ beforeEach(function () {
 });
 ```
 
-`@property` annotations take precedence over inferred types.
+PHPDoc tags take precedence over inferred types.
 
 ## Configuration
-
-By default the extension uses `PHPUnit\Framework\TestCase` as the base class. To use a custom test case:
 
 ```neon
 parameters:
     pestPhpstanTypedThis:
-        testCaseClass: Tests\TestCase
+        testCaseClass: PHPUnit\Framework\TestCase  # Base test case class
+        parsePestPropertyTags: false               # @pest-property tags
+        parsePhpDocProperties: false               # @property PHPDoc tags
+        parseAssignments: true                     # $this->prop = expr inference
 ```
+
+By default, the extension uses assignment inference. The `@pest-property` and `@property` PHPDoc parsers are opt-in.
 
 ## What it solves
 
@@ -82,10 +82,6 @@ parameters:
 <?php
 
 use App\Models\User;
-
-/**
- * @property User $user
- */
 
 beforeEach(function () {
     $this->user = User::factory()->create();
@@ -149,7 +145,20 @@ it('uses custom expectations', function () {
 
 ## Supported Pest functions
 
-`it`, `test`, `describe`, `beforeEach`, `afterEach`, `beforeAll`, `afterAll` (both short and `Pest\` namespaced forms).
+`it`, `test`, `describe`, `beforeEach`, `afterEach` (both short and `Pest\` namespaced forms).
+
+## PHPStan API Compatibility
+
+This extension relies on 4 PHPStan APIs that are not covered by the backward compatibility promise. These are baselined and may require updates on minor PHPStan releases.
+
+| API | Used by | Why |
+|---|---|---|
+| `WrappedExtendedPropertyReflection` | All sources | Wraps `PropertyReflection` into `ExtendedPropertyReflection` — required by `UnresolvedPropertyPrototypeReflection` return types |
+| `UnresolvedPropertyPrototypeReflection` | All sources | Required by `ObjectType::getUnresolvedPropertyPrototype()` — the only way to hook into property access on a custom type |
+| `PhpDocStringResolver::resolve()` | `@pest-property` | Parses PHPDoc blocks to extract `@pest-property` tags from file-level statements |
+| `PhpDocStringResolver::resolve()` | `@property` | Parses PHPDoc blocks to extract `@property` tags from file-level statements |
+
+The assignment inference parser uses stable APIs (`NodeFinder`, `InitializerExprTypeResolver`) for **discovery**, but all sources depend on the unstable property exposure APIs above.
 
 ## License
 

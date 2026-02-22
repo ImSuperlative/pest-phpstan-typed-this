@@ -1,27 +1,83 @@
 parametersSchema:
     pestPhpstanTypedThis: structure([
         testCaseClass: string()
+        parsePestPropertyTags: bool()
+        parsePhpDocProperties: bool()
+        parseAssignments: bool()
     ])
 
 parameters:
     pestPhpstanTypedThis:
         testCaseClass: PHPUnit\Framework\TestCase
+        parsePestPropertyTags: false
+        parsePhpDocProperties: false
+        parseAssignments: true
 
-    universalObjectCratesClasses:
-        - Pest\Mixins\Expectation
+    #universalObjectCratesClasses:
+    #    - Pest\Support\HigherOrderTapProxy
 
 services:
-    -
-        class: ImSuperlative\PestPhpstanTypedThis\PestFilePropertyParser
+    phpParserFactory:
+        class: PhpParser\ParserFactory
 
     -
-        class: ImSuperlative\PestPhpstanTypedThis\PestTypedClosureThisExtension
+        class: PhpParser\Parser
+        factory: @phpParserFactory::createForNewestSupportedVersion
+
+    -
+        class: PhpParser\NodeFinder
+
+    -
+        class: ImSuperlative\PestPhpstanTypedThis\Parser\TypeStringParser
+
+    -
+        class: ImSuperlative\PestPhpstanTypedThis\Parser\TypeResolver
+
+    -
+        class: ImSuperlative\PestPhpstanTypedThis\Parser\PestPropertyTagParser
+
+    -
+        class: ImSuperlative\PestPhpstanTypedThis\Parser\PhpDocPropertyParser
+
+    -
+        class: ImSuperlative\PestPhpstanTypedThis\Parser\AssignmentInferenceParser
+        arguments:
+            testCaseClass: %pestPhpstanTypedThis.testCaseClass%
+
+    pestFilePropertyParserFactory:
+        class: ImSuperlative\PestPhpstanTypedThis\TypedThis\FilePropertyParserFactory
+        arguments:
+            parsePestPropertyTags: %pestPhpstanTypedThis.parsePestPropertyTags%
+            parsePhpDocProperties: %pestPhpstanTypedThis.parsePhpDocProperties%
+            parseAssignments: %pestPhpstanTypedThis.parseAssignments%
+
+    -
+        class: ImSuperlative\PestPhpstanTypedThis\TypedThis\FilePropertyParser
+        factory: @pestFilePropertyParserFactory::create
+
+    -
+        class: ImSuperlative\PestPhpstanTypedThis\TypedThis\ClosureThisExtension
         arguments:
             testCaseClass: %pestPhpstanTypedThis.testCaseClass%
         tags:
             - phpstan.functionParameterClosureThisExtension
 
     -
-        class: ImSuperlative\PestPhpstanTypedThis\PestExpectationMethodExtension
+        class: ImSuperlative\PestPhpstanTypedThis\Expectation\MethodExtension
         tags:
             - phpstan.broker.methodsClassReflectionExtension
+
+    -
+        class: ImSuperlative\PestPhpstanTypedThis\Expectation\PropertyExtension
+        tags:
+            - phpstan.broker.propertiesClassReflectionExtension
+
+    -
+        class: ImSuperlative\PestPhpstanTypedThis\Expectation\DynamicReturnTypeExtension
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension
+
+    -
+        class: ImSuperlative\PestPhpstanTypedThis\Expectation\HigherOrderDynamicReturnTypeExtension
+        tags:
+            - phpstan.broker.dynamicMethodReturnTypeExtension

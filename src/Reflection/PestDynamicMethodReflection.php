@@ -1,6 +1,8 @@
 <?php
 
-namespace ImSuperlative\PestPhpstanTypedThis;
+declare(strict_types=1);
+
+namespace ImSuperlative\PestPhpstanTypedThis\Reflection;
 
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\FunctionVariant;

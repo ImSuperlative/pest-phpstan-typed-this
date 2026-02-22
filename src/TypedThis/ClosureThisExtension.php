@@ -1,46 +1,46 @@
 <?php
 
-namespace ImSuperlative\PestPhpstanTypedThis;
+declare(strict_types=1);
+
+namespace ImSuperlative\PestPhpstanTypedThis\TypedThis;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Reflection\ParameterReflection;
+use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Type\FunctionParameterClosureThisExtension;
 use PHPStan\Type\Type;
 
 /**
  * Resolves $this type in Pest test/hook closures with per-file typed properties.
  *
- * Returns PestTestCaseType which extends ObjectType with writable dynamic properties
- * parsed from @property annotations and beforeEach assignments.
+ * Returns TestCaseType which extends ObjectType with writable dynamic properties
+ * parsed from @-pest-property tags, @-property annotations, and beforeEach assignments.
  *
  * This gives $this both TestCase methods AND typed dynamic properties
  * that are readable and writable (unlike ObjectShapeType which is read-only).
  */
-final class PestTypedClosureThisExtension implements FunctionParameterClosureThisExtension
+final class ClosureThisExtension implements FunctionParameterClosureThisExtension
 {
-    /** All Pest functions that bind $this. */
+    /** Pest functions that bind $this to the test case instance. */
     private const array PEST_FUNCTIONS = [
         'it',
         'test',
         'describe',
         'beforeEach',
         'afterEach',
-        'beforeAll',
-        'afterAll',
         'Pest\it',
         'Pest\test',
         'Pest\describe',
         'Pest\beforeEach',
         'Pest\afterEach',
-        'Pest\beforeAll',
-        'Pest\afterAll',
     ];
 
     /** @param  class-string  $testCaseClass */
     public function __construct(
-        private PestFilePropertyParser $parser,
+        private FilePropertyParser $parser,
+        private ReflectionProvider $reflectionProvider,
         private string $testCaseClass = 'PHPUnit\Framework\TestCase',
     ) {
     }
@@ -58,6 +58,6 @@ final class PestTypedClosureThisExtension implements FunctionParameterClosureThi
     ): Type {
         $properties = $this->parser->parse($scope->getFile());
 
-        return new PestTestCaseType($this->testCaseClass, $properties);
+        return new TestCaseType($this->testCaseClass, $properties, $this->reflectionProvider);
     }
 }

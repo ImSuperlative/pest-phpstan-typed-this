@@ -3,10 +3,11 @@
 use Illuminate\Support\Collection;
 
 /**
- * Annotation declares $thing as Collection, assignment infers stdClass.
- * The annotation should win, so calling count() (a Collection method) should pass.
+ * Annotation declares $thing as ?Collection (nullable), assignment infers Collection (non-null).
+ * If annotation wins, $thing is ?Collection so calling count() directly would be an error.
+ * We null-check first to prove the nullable type from the annotation is in effect.
  *
- * @property Collection $thing
+ * @property ?Collection $thing
  */
 
 beforeEach(function () {
@@ -14,6 +15,7 @@ beforeEach(function () {
 });
 
 it('uses annotation type over inferred type', function () {
-    // This works because annotation says Collection, which has count().
-    expect($this->thing->count())->toBeInt();
+    if ($this->thing !== null) {
+        expect($this->thing->count())->toBeInt();
+    }
 });

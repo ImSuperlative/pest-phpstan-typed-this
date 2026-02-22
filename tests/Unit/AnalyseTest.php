@@ -85,3 +85,33 @@ it('resolves use imports in inferred types', function () {
 
     expect($result['exitCode'])->toBe(0);
 });
+
+it('parses @pest-property custom tags', function () {
+    $result = analyseFixture('PestPropertyTag.php');
+
+    expect($result['exitCode'])->toBe(0);
+});
+
+it('gives @pest-property precedence over @property', function () {
+    $result = analyseFixture('PestPropertyPrecedence.php');
+
+    expect($result['exitCode'])->toBe(0);
+});
+
+it('ignores @property when parsePhpDocProperties is disabled', function () {
+    $result = analyseFixture('DisabledPhpDocParser.php', 'phpstan-test-defaults.neon');
+
+    expect($result['exitCode'])->toBe(0);
+});
+
+it('applies @property when parsePhpDocProperties is enabled', function () {
+    $result = analyseFixture('DisabledPhpDocParser.php');
+
+    expect($result['exitCode'])->toBe(1);
+});
+
+it('allows dynamic methods on Pest Expectation', function () {
+    $result = analyseFixture('ExpectationExtension.php');
+
+    expect($result['exitCode'])->toBe(0);
+});

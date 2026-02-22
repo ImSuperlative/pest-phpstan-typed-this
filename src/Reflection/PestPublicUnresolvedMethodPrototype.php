@@ -1,13 +1,18 @@
 <?php
 
-namespace ImSuperlative\PestPhpstanTypedThis;
+declare(strict_types=1);
+
+namespace ImSuperlative\PestPhpstanTypedThis\Reflection;
 
 use PHPStan\Reflection\ExtendedMethodReflection;
 use PHPStan\Reflection\Type\UnresolvedMethodPrototypeReflection;
 use PHPStan\Type\Type;
 
 /**
- * Wraps an UnresolvedMethodPrototypeReflection to make its methods public.
+ * Wraps an UnresolvedMethodPrototypeReflection to return a public method reflection.
+ *
+ * Works with PestPublicExtendedMethodReflection to make protected TestCase methods
+ * accessible inside Pest closures.
  */
 final class PestPublicUnresolvedMethodPrototype implements UnresolvedMethodPrototypeReflection
 {
@@ -22,12 +27,14 @@ final class PestPublicUnresolvedMethodPrototype implements UnresolvedMethodProto
 
     public function getNakedMethod(): ExtendedMethodReflection
     {
-        return new PestPublicMethodReflection($this->wrapped->getNakedMethod());
+        return $this->wrapped->getNakedMethod();
     }
 
     public function getTransformedMethod(): ExtendedMethodReflection
     {
-        return new PestPublicMethodReflection($this->wrapped->getTransformedMethod());
+        $method = $this->wrapped->getTransformedMethod();
+
+        return new PestPublicExtendedMethodReflection($method);
     }
 
     public function withCalledOnType(Type $type): self

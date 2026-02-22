@@ -1,23 +1,25 @@
 <?php
 
-namespace ImSuperlative\PestPhpstanTypedThis;
+declare(strict_types=1);
 
-use PHPStan\PhpDoc\ResolvedPhpDocBlock;
+namespace ImSuperlative\PestPhpstanTypedThis\Reflection;
+
+use PHPStan\BetterReflection\Reflection\ReflectionAttribute;
 use PHPStan\Reflection\Assertions;
-use PHPStan\Reflection\ClassMemberReflection;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\ExtendedMethodReflection;
 use PHPStan\Reflection\ExtendedParametersAcceptor;
+use PHPStan\PhpDoc\ResolvedPhpDocBlock;
 use PHPStan\TrinaryLogic;
 use PHPStan\Type\Type;
 
 /**
- * Wraps an ExtendedMethodReflection to report it as public.
+ * Wraps an ExtendedMethodReflection but reports it as public.
  *
- * In Pest closures, $this is bound to the TestCase instance,
- * so protected methods should be accessible.
+ * Used by PestPublicUnresolvedMethodPrototype to expose protected
+ * TestCase methods inside Pest closures.
  */
-final class PestPublicMethodReflection implements ExtendedMethodReflection
+final class PestPublicExtendedMethodReflection implements ExtendedMethodReflection
 {
     public function __construct(
         private ExtendedMethodReflection $wrapped,
@@ -33,9 +35,19 @@ final class PestPublicMethodReflection implements ExtendedMethodReflection
         return false;
     }
 
+    public function getDeclaringClass(): ClassReflection
+    {
+        return $this->wrapped->getDeclaringClass();
+    }
+
     public function isStatic(): bool
     {
         return $this->wrapped->isStatic();
+    }
+
+    public function getDocComment(): ?string
+    {
+        return $this->wrapped->getDocComment();
     }
 
     public function getName(): string
@@ -43,14 +55,9 @@ final class PestPublicMethodReflection implements ExtendedMethodReflection
         return $this->wrapped->getName();
     }
 
-    public function getDeclaringClass(): ClassReflection
+    public function getPrototype(): ExtendedMethodReflection
     {
-        return $this->wrapped->getDeclaringClass();
-    }
-
-    public function getPrototype(): ClassMemberReflection
-    {
-        return $this->wrapped->getPrototype();
+        return $this;
     }
 
     /** @return list<ExtendedParametersAcceptor> */
@@ -95,12 +102,12 @@ final class PestPublicMethodReflection implements ExtendedMethodReflection
         return $this->wrapped->isFinalByKeyword();
     }
 
-    public function isAbstract(): bool
+    public function isAbstract(): TrinaryLogic
     {
         return $this->wrapped->isAbstract();
     }
 
-    public function isBuiltin(): bool
+    public function isBuiltin(): TrinaryLogic
     {
         return $this->wrapped->isBuiltin();
     }
@@ -110,7 +117,7 @@ final class PestPublicMethodReflection implements ExtendedMethodReflection
         return $this->wrapped->isPure();
     }
 
-    /** @return list<\PHPStan\Reflection\AttributeReflection> */
+    /** @return list<ReflectionAttribute> */
     public function getAttributes(): array
     {
         return $this->wrapped->getAttributes();
@@ -154,10 +161,5 @@ final class PestPublicMethodReflection implements ExtendedMethodReflection
     public function hasSideEffects(): TrinaryLogic
     {
         return $this->wrapped->hasSideEffects();
-    }
-
-    public function getDocComment(): ?string
-    {
-        return $this->wrapped->getDocComment();
     }
 }
