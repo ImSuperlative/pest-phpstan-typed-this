@@ -1,5 +1,63 @@
 <?php
 
+/** @noinspection StaticClosureCanBeUsedInspection */
+
+use Symfony\Component\Process\Process;
+
+/**
+ * @return array{exitCode: int, output: string, errors: array<string, mixed>}
+ */
+function analyseFixture(string $fixture, string $config = 'phpstan-test.neon'): array
+{
+    $fixturePath = dirname(__DIR__).'/Fixtures/'.$fixture;
+    $configPath = dirname(__DIR__).'/'.$config;
+    $phpstanBin = dirname(__DIR__, 2).'/vendor/bin/phpstan';
+
+    $process = new Process([
+        $phpstanBin,
+        'analyse',
+        '--no-progress',
+        '--error-format=json',
+        '--configuration='.$configPath,
+        $fixturePath,
+    ]);
+    $process->run();
+
+    if ($process->getExitCode() > 1) {
+        throw new RuntimeException(sprintf(
+            'PHPStan crashed (exit code %d):\n%s',
+            $process->getExitCode(),
+            $process->getErrorOutput(),
+        ));
+    }
+
+    $json = json_decode($process->getOutput(), true) ?? [];
+
+    return [
+        'exitCode' => (int) $process->getExitCode(),
+        'output' => $process->getOutput(),
+        'errors' => $json['files'] ?? [],
+    ];
+}
+
+/**
+ * Extract error messages from PHPStan JSON output.
+ *
+ * @param  array{exitCode: int, output: string, errors: array<string, mixed>}  $result
+ * @return array<string>
+ */
+function getErrorMessages(array $result): array
+{
+    $messages = [];
+    foreach ($result['errors'] as $file) {
+        foreach ($file['messages'] as $message) {
+            $messages[] = $message['message'];
+        }
+    }
+
+    return $messages;
+}
+
 it('passes with @property annotations', function () {
     $result = analyseFixture('PropertyAnnotation.php');
 
@@ -115,3 +173,16 @@ it('allows dynamic methods on Pest Expectation', function () {
 
     expect($result['exitCode'])->toBe(0);
 });
+
+it('allows higher-order property access on expectations', function () {
+    $result = analyseFixture('ExpectationPropertyAccess.php');
+
+    expect($result['exitCode'])->toBe(0);
+});
+
+it('falls back gracefully when expectationPropertyAccess is disabled', function () {
+    $result = analyseFixture('ExpectationPropertyAccess.php', 'phpstan-test-no-property-access.neon');
+
+    expect($result['exitCode'])->toBe(1);
+});
+

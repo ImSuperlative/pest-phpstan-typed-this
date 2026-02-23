@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ImSuperlative\PestPhpstanTypedThis\Expectation;
 
 use PhpParser\Node\Expr\MethodCall;
-use PHPStan\Analyser\OutOfClassScope;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Reflection\ReflectionProvider;
@@ -26,10 +25,6 @@ use PHPStan\Type\Type;
  */
 final class HigherOrderDynamicReturnTypeExtension implements DynamicMethodReturnTypeExtension
 {
-    private const string EXPECTATION_CLASS = 'Pest\Expectation';
-
-    private const string HIGHER_ORDER_CLASS = 'Pest\Expectations\HigherOrderExpectation';
-
     private const array NATIVE_METHODS = ['scoped', 'not', 'expect', 'and', 'json', '__call', '__get'];
 
     public function __construct(
@@ -38,7 +33,7 @@ final class HigherOrderDynamicReturnTypeExtension implements DynamicMethodReturn
 
     public function getClass(): string
     {
-        return self::HIGHER_ORDER_CLASS;
+        return PestExpectationClasses::HIGHER_ORDER;
     }
 
     public function isMethodSupported(MethodReflection $methodReflection): bool
@@ -52,7 +47,7 @@ final class HigherOrderDynamicReturnTypeExtension implements DynamicMethodReturn
         Scope $scope,
     ): ?Type {
         $callerType = $scope->getType($methodCall->var);
-        $tOriginal = $this->extractTemplateType($callerType, 'TOriginalValue');
+        $tOriginal = $this->extractOriginalValueType($callerType);
 
         return $tOriginal !== null
             ? $this->resolveHigherOrderType($callerType, $tOriginal, $methodReflection->getName())
@@ -61,14 +56,14 @@ final class HigherOrderDynamicReturnTypeExtension implements DynamicMethodReturn
 
     private function resolveHigherOrderType(Type $callerType, Type $tOriginal, string $methodName): GenericObjectType
     {
-        $tValue = $callerType->getTemplateType(self::HIGHER_ORDER_CLASS, 'TValue');
+        $tValue = $callerType->getTemplateType(PestExpectationClasses::HIGHER_ORDER, 'TValue');
 
         $resolvedValue = $this->resolveAsExpectationMethod($methodName, $tValue)
-            ?? $this->resolveMethodReturnType($tValue, $methodName)
-            ?? $this->resolvePropertyType($tValue, $methodName)
+            ?? PestExpectationClasses::resolveMethodReturnType($tValue, $methodName)
+            ?? PestExpectationClasses::resolvePropertyType($tValue, $methodName)
             ?? new MixedType();
 
-        return new GenericObjectType(self::HIGHER_ORDER_CLASS, [$tOriginal, $resolvedValue]);
+        return new GenericObjectType(PestExpectationClasses::HIGHER_ORDER, [$tOriginal, $resolvedValue]);
     }
 
     /** Assertion methods (toBe, toBeString, etc.) preserve TValue unchanged */
@@ -77,23 +72,9 @@ final class HigherOrderDynamicReturnTypeExtension implements DynamicMethodReturn
         return $this->isExpectationMethod($methodName) ? $tValue : null;
     }
 
-    private function resolveMethodReturnType(Type $valueType, string $name): ?Type
+    private function extractOriginalValueType(Type $type): ?Type
     {
-        return $valueType->hasMethod($name)->yes()
-            ? $valueType->getMethod($name, new OutOfClassScope())->getVariants()[0]->getReturnType()
-            : null;
-    }
-
-    private function resolvePropertyType(Type $valueType, string $name): ?Type
-    {
-        return $valueType->hasProperty($name)->yes()
-            ? $valueType->getProperty($name, new OutOfClassScope())->getReadableType()
-            : null;
-    }
-
-    private function extractTemplateType(Type $type, string $templateName): ?Type
-    {
-        $template = $type->getTemplateType(self::HIGHER_ORDER_CLASS, $templateName);
+        $template = $type->getTemplateType(PestExpectationClasses::HIGHER_ORDER, 'TOriginalValue');
 
         return $template instanceof MixedType && ! $template->isExplicitMixed()
             ? null
@@ -102,7 +83,7 @@ final class HigherOrderDynamicReturnTypeExtension implements DynamicMethodReturn
 
     private function isExpectationMethod(string $methodName): bool
     {
-        return $this->reflectionProvider->hasClass(self::EXPECTATION_CLASS)
-            && $this->reflectionProvider->getClass(self::EXPECTATION_CLASS)->hasMethod($methodName);
+        return $this->reflectionProvider->hasClass(PestExpectationClasses::EXPECTATION)
+            && $this->reflectionProvider->getClass(PestExpectationClasses::EXPECTATION)->hasMethod($methodName);
     }
 }

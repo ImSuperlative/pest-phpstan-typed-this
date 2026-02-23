@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace ImSuperlative\PestPhpstanTypedThis\Expectation;
 
 use ImSuperlative\PestPhpstanTypedThis\Reflection\PestDynamicMethodReflection;
-use Pest\Expectation;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Reflection\MethodsClassReflectionExtension;
@@ -14,16 +13,14 @@ use PHPStan\Type\MixedType;
 
 final class MethodExtension implements MethodsClassReflectionExtension
 {
-    /** @noinspection ClassConstantCanBeUsedInspection */
     private const array EXPECTATION_CLASSES = [
-        Expectation::class,
-        'Pest\Mixins\Expectation',
+        PestExpectationClasses::EXPECTATION,
+        PestExpectationClasses::EXPECTATION_MIXIN,
     ];
 
     public function __construct(
         private ReflectionProvider $reflectionProvider,
-    ) {
-    }
+    ) {}
 
     public function hasMethod(ClassReflection $classReflection, string $methodName): bool
     {
@@ -39,8 +36,8 @@ final class MethodExtension implements MethodsClassReflectionExtension
 
     private function isExpectationSubclass(ClassReflection $classReflection): bool
     {
-        return $this->reflectionProvider->hasClass(Expectation::class)
-            && $classReflection->isSubclassOfClass($this->reflectionProvider->getClass(Expectation::class));
+        return $this->reflectionProvider->hasClass(PestExpectationClasses::EXPECTATION)
+            && $classReflection->isSubclassOfClass($this->reflectionProvider->getClass(PestExpectationClasses::EXPECTATION));
     }
 
     public function getMethod(ClassReflection $classReflection, string $methodName): MethodReflection

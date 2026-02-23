@@ -6,7 +6,6 @@ namespace ImSuperlative\PestPhpstanTypedThis\Expectation;
 
 use ImSuperlative\PestPhpstanTypedThis\Reflection\PestDynamicMethodReflection;
 use PhpParser\Node\Expr\MethodCall;
-use PHPStan\Analyser\OutOfClassScope;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Type\DynamicMethodReturnTypeExtension;
@@ -24,13 +23,9 @@ use PHPStan\Type\Type;
  */
 final class DynamicReturnTypeExtension implements DynamicMethodReturnTypeExtension
 {
-    private const string EXPECTATION_CLASS = 'Pest\Expectation';
-
-    private const string HIGHER_ORDER_CLASS = 'Pest\Expectations\HigherOrderExpectation';
-
     public function getClass(): string
     {
-        return self::EXPECTATION_CLASS;
+        return PestExpectationClasses::EXPECTATION;
     }
 
     public function isMethodSupported(MethodReflection $methodReflection): bool
@@ -49,8 +44,8 @@ final class DynamicReturnTypeExtension implements DynamicMethodReturnTypeExtensi
         $methodName = $methodReflection->getName();
 
         $resolvedType = $valueType !== null
-            ? $this->resolvePropertyType($valueType, $methodName)
-                ?? $this->resolveMethodReturnType($valueType, $methodName)
+            ? PestExpectationClasses::resolvePropertyType($valueType, $methodName)
+                ?? PestExpectationClasses::resolveMethodReturnType($valueType, $methodName)
             : null;
 
         return $resolvedType !== null
@@ -58,23 +53,9 @@ final class DynamicReturnTypeExtension implements DynamicMethodReturnTypeExtensi
             : null;
     }
 
-    private function resolvePropertyType(Type $valueType, string $name): ?Type
-    {
-        return $valueType->hasProperty($name)->yes()
-            ? $valueType->getProperty($name, new OutOfClassScope())->getReadableType()
-            : null;
-    }
-
-    private function resolveMethodReturnType(Type $valueType, string $name): ?Type
-    {
-        return $valueType->hasMethod($name)->yes()
-            ? $valueType->getMethod($name, new OutOfClassScope())->getVariants()[0]->getReturnType()
-            : null;
-    }
-
     private function extractValueType(Type $type): ?Type
     {
-        $tValue = $type->getTemplateType(self::EXPECTATION_CLASS, 'TValue');
+        $tValue = $type->getTemplateType(PestExpectationClasses::EXPECTATION, 'TValue');
 
         return $tValue instanceof MixedType && ! $tValue->isExplicitMixed()
             ? null
@@ -86,7 +67,7 @@ final class DynamicReturnTypeExtension implements DynamicMethodReturnTypeExtensi
      */
     private function buildHigherOrderType(Type $originalExpectationType, Type $resolvedType): GenericObjectType
     {
-        return new GenericObjectType(self::HIGHER_ORDER_CLASS, [
+        return new GenericObjectType(PestExpectationClasses::HIGHER_ORDER, [
             $originalExpectationType,
             $resolvedType,
         ]);

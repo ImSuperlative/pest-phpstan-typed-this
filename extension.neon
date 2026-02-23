@@ -4,6 +4,7 @@ parametersSchema:
         parsePestPropertyTags: bool()
         parsePhpDocProperties: bool()
         parseAssignments: bool()
+        expectationPropertyAccess: bool()
     ])
 
 parameters:
@@ -12,6 +13,7 @@ parameters:
         parsePestPropertyTags: false
         parsePhpDocProperties: false
         parseAssignments: true
+        expectationPropertyAccess: true
 
     #universalObjectCratesClasses:
     #    - Pest\Support\HigherOrderTapProxy
@@ -62,15 +64,16 @@ services:
         tags:
             - phpstan.functionParameterClosureThisExtension
 
+    pestExpectFunctionReturnType:
+        class: ImSuperlative\PestPhpstanTypedThis\Expectation\ExpectFunctionReturnTypeExtension
+
     -
         class: ImSuperlative\PestPhpstanTypedThis\Expectation\MethodExtension
         tags:
             - phpstan.broker.methodsClassReflectionExtension
 
-    -
+    pestExpectationPropertyExtension:
         class: ImSuperlative\PestPhpstanTypedThis\Expectation\PropertyExtension
-        tags:
-            - phpstan.broker.propertiesClassReflectionExtension
 
     -
         class: ImSuperlative\PestPhpstanTypedThis\Expectation\DynamicReturnTypeExtension
@@ -81,3 +84,9 @@ services:
         class: ImSuperlative\PestPhpstanTypedThis\Expectation\HigherOrderDynamicReturnTypeExtension
         tags:
             - phpstan.broker.dynamicMethodReturnTypeExtension
+
+conditionalTags:
+    ImSuperlative\PestPhpstanTypedThis\Expectation\ExpectFunctionReturnTypeExtension:
+        phpstan.broker.dynamicFunctionReturnTypeExtension: %pestPhpstanTypedThis.expectationPropertyAccess%
+    ImSuperlative\PestPhpstanTypedThis\Expectation\PropertyExtension:
+        phpstan.broker.propertiesClassReflectionExtension: %pestPhpstanTypedThis.expectationPropertyAccess%

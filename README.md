@@ -6,6 +6,20 @@ Solves the "undefined property" errors PHPStan reports when you assign dynamic p
 
 > ⚠️ **Note:** This extension uses some [unstable PHPStan APIs](#phpstan-api-compatibility) and may require updates on minor PHPStan releases.
 
+## Table of contents
+
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Features](#features)
+  - [Typed dynamic properties](#typed-dynamic-properties) — `parseAssignments`, `parsePestPropertyTags`, `parsePhpDocProperties`
+  - [Protected TestCase methods](#protected-testcase-methods)
+  - [Higher-order expectation proxying](#higher-order-expectation-proxying)
+  - [Higher-order property access on expectations](#higher-order-property-access-on-expectations) — `expectationPropertyAccess`
+  - [Custom expectations](#custom-expectations)
+- [Supported Pest functions](#supported-pest-functions)
+- [PHPStan API Compatibility](#phpstan-api-compatibility)
+
 ## Requirements
 
 - PHP 8.2+
@@ -24,13 +38,52 @@ includes:
     - vendor/imsuperlative/pest-phpstan-typed-this/extension.neon
 ```
 
-## How it works
+## Configuration
 
-The extension parses your Pest test files and picks up property types from two sources (**in precedence order**):
+```neon
+parameters:
+    pestPhpstanTypedThis:
+        testCaseClass: PHPUnit\Framework\TestCase  # Base test case class
+        parseAssignments: true                     # $this->prop = expr inference
+        parsePestPropertyTags: false               # @pest-property tags
+        parsePhpDocProperties: false               # @property PHPDoc tags
+        expectationPropertyAccess: true            # Higher-order property access on expect()
+```
 
-### 1. PHPDoc tags (default: disabled)
+By default, the extension uses assignment inference with higher-order property access on expectations. The `@pest-property` and `@property` PHPDoc parsers are opt-in.
 
-`@pest-property` and `@property` tags at the top of your test file. `@pest-property` takes precedence over `@property`.
+If your project extends the base TestCase (e.g. in Laravel with Testbench), point `testCaseClass` to your own class so the extension can resolve its methods and properties:
+
+```neon
+parameters:
+    pestPhpstanTypedThis:
+        testCaseClass: Tests\TestCase
+```
+
+## Features
+
+### Typed dynamic properties
+
+`parseAssignments: true` (default) — infers types from `$this->prop = expr` assignments using PHPStan's own type resolver. Any expression PHPStan can resolve will work:
+
+```php
+<?php
+
+use App\Models\User;
+
+beforeEach(function () {
+    $this->user = User::factory()->create();
+    $this->service = app(UserService::class);
+    $this->mock = mock(Mailer::class);
+});
+
+it('has a name', function () {
+    // PHPStan knows $this->user is User
+    expect($this->user->name)->toBeString();
+});
+```
+
+Alternatively, enable `parsePestPropertyTags` or `parsePhpDocProperties` to declare types via PHPDoc tags at the top of your test file. PHPDoc tags take precedence over inferred types, and `@pest-property` takes precedence over `@property`.
 
 ```php
 <?php
@@ -43,53 +96,6 @@ The extension parses your Pest test files and picks up property types from two s
 beforeEach(function () {
     $this->user = User::factory()->create();
     $this->team = null;
-});
-```
-
-### 2. Auto-inference from assignments (default: enabled)
-
-The extension infers types from `$this->prop = expr` assignments using PHPStan's own type resolver. Any expression PHPStan can resolve will work:
-
-```php
-beforeEach(function () {
-    $this->user    = new User();
-    $this->service = app(UserService::class);
-    $this->mock    = mock(Mailer::class);
-    // ... any expression PHPStan can type
-});
-```
-
-PHPDoc tags take precedence over inferred types.
-
-## Configuration
-
-```neon
-parameters:
-    pestPhpstanTypedThis:
-        testCaseClass: PHPUnit\Framework\TestCase  # Base test case class
-        parsePestPropertyTags: false               # @pest-property tags
-        parsePhpDocProperties: false               # @property PHPDoc tags
-        parseAssignments: true                     # $this->prop = expr inference
-```
-
-By default, the extension uses assignment inference. The `@pest-property` and `@property` PHPDoc parsers are opt-in.
-
-## What it solves
-
-### Typed dynamic properties
-
-```php
-<?php
-
-use App\Models\User;
-
-beforeEach(function () {
-    $this->user = User::factory()->create();
-});
-
-it('has a name', function () {
-    // PHPStan knows $this->user is User
-    expect($this->user->name)->toBeString();
 });
 ```
 
@@ -130,6 +136,36 @@ it('proxies collection methods', function () {
 });
 ```
 
+### Higher-order property access on expectations
+
+`expectationPropertyAccess: true` (default) — access properties directly on `expect()` to assert on nested values:
+
+```php
+<?php
+
+use App\Models\Participant;
+
+it('asserts on object properties', function () {
+    $participant = Participant::factory()->create();
+
+    // With expectationPropertyAccess: true (default)
+    expect($participant)
+        ->name->toBe('Test');
+
+    // Without expectationPropertyAccess — narrow the type first
+    expect($participant)->toBeInstanceOf(Participant::class)
+        ->name->toBe('Test');
+
+    // toBeArray() and toBeObject() also narrow the type
+    expect(['a' => 1])->toBeArray()
+        ->toHaveKey('a');
+    expect($participant)->toBeObject()
+        ->name->toBe('Test');
+});
+```
+
+With `expectationPropertyAccess` disabled, you can still access properties on expectations by narrowing the type first with `toBeInstanceOf()`, `toBeArray()`, or `toBeObject()`. The extension simply makes this work without the explicit narrowing step.
+
 ### Custom expectations
 
 Custom expectations registered via `expect()->extend()` are also supported:
@@ -151,12 +187,12 @@ it('uses custom expectations', function () {
 
 This extension relies on 4 PHPStan APIs that are not covered by the backward compatibility promise. These are baselined and may require updates on minor PHPStan releases.
 
-| API | Used by | Why |
-|---|---|---|
-| `WrappedExtendedPropertyReflection` | All sources | Wraps `PropertyReflection` into `ExtendedPropertyReflection` — required by `UnresolvedPropertyPrototypeReflection` return types |
-| `UnresolvedPropertyPrototypeReflection` | All sources | Required by `ObjectType::getUnresolvedPropertyPrototype()` — the only way to hook into property access on a custom type |
-| `PhpDocStringResolver::resolve()` | `@pest-property` | Parses PHPDoc blocks to extract `@pest-property` tags from file-level statements |
-| `PhpDocStringResolver::resolve()` | `@property` | Parses PHPDoc blocks to extract `@property` tags from file-level statements |
+| API                                      | Used by            | Why                                                                                                              |
+|------------------------------------------|--------------------|------------------------------------------------------------------------------------------------------------------|
+| `WrappedExtendedPropertyReflection`      | All sources        | Wraps `PropertyReflection` into `ExtendedPropertyReflection` — required by `UnresolvedPropertyPrototypeReflection` return types |
+| `UnresolvedPropertyPrototypeReflection`  | All sources        | Required by `ObjectType::getUnresolvedPropertyPrototype()` — the only way to hook into property access on a custom type         |
+| `PhpDocStringResolver::resolve()`        | `@pest-property`   | Parses PHPDoc blocks to extract `@pest-property` tags from file-level statements                                 |
+| `PhpDocStringResolver::resolve()`        | `@property`        | Parses PHPDoc blocks to extract `@property` tags from file-level statements                                      |
 
 The assignment inference parser uses stable APIs (`NodeFinder`, `InitializerExprTypeResolver`) for **discovery**, but all sources depend on the unstable property exposure APIs above.
 

@@ -1,0 +1,6 @@
+includes:
+    - phpstan-test.neon
+
+parameters:
+    pestPhpstanTypedThis:
+        expectationPropertyAccess: false
