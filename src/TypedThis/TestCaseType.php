@@ -8,6 +8,7 @@ use ImSuperlative\PestPhpstanTypedThis\Reflection\PestPropertyReflection;
 use ImSuperlative\PestPhpstanTypedThis\Reflection\PestPublicUnresolvedMethodPrototype;
 use ImSuperlative\PestPhpstanTypedThis\Reflection\PestUnresolvedPropertyPrototype;
 use PHPStan\Reflection\ClassMemberAccessAnswerer;
+use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Reflection\Type\UnresolvedMethodPrototypeReflection;
 use PHPStan\Reflection\Type\UnresolvedPropertyPrototypeReflection;
@@ -16,8 +17,6 @@ use PHPStan\TrinaryLogic;
 use PHPStan\Type\ObjectType;
 use PHPStan\Type\Type;
 use PHPStan\Type\VerbosityLevel;
-use stdClass;
-
 /**
  * Extended ObjectType that adds typed dynamic properties to the TestCase.
  *
@@ -27,11 +26,15 @@ use stdClass;
  */
 final class TestCaseType extends ObjectType
 {
-    /** @param array<string, Type> $dynamicProperties */
+    /**
+     * @param  array<string, Type>  $dynamicProperties
+     * @param  list<ClassReflection>  $traits  Resolved trait reflections from uses() calls
+     */
     public function __construct(
         string $className,
         private array $dynamicProperties,
         private ReflectionProvider $reflectionProvider,
+        private array $traits = [],
     ) {
         parent::__construct($className);
     }
@@ -71,39 +74,51 @@ final class TestCaseType extends ObjectType
         string $propertyName,
         ClassMemberAccessAnswerer $scope,
     ): UnresolvedPropertyPrototypeReflection {
-        if (isset($this->dynamicProperties[$propertyName])) {
-            return $this->buildPropertyPrototype($propertyName);
-        }
-
-        return parent::getUnresolvedPropertyPrototype($propertyName, $scope);
+        return isset($this->dynamicProperties[$propertyName])
+            ? $this->buildPropertyPrototype($propertyName)
+            : parent::getUnresolvedPropertyPrototype($propertyName, $scope);
     }
 
     public function getUnresolvedInstancePropertyPrototype(
         string $propertyName,
         ClassMemberAccessAnswerer $scope,
     ): UnresolvedPropertyPrototypeReflection {
-        if (isset($this->dynamicProperties[$propertyName])) {
-            return $this->buildPropertyPrototype($propertyName);
-        }
+        return isset($this->dynamicProperties[$propertyName])
+            ? $this->buildPropertyPrototype($propertyName)
+            : parent::getUnresolvedInstancePropertyPrototype($propertyName, $scope);
+    }
 
-        return parent::getUnresolvedInstancePropertyPrototype($propertyName, $scope);
+    public function hasMethod(string $methodName): TrinaryLogic
+    {
+        return array_any($this->traits, static fn (ClassReflection $trait) => $trait->hasMethod($methodName))
+            ? TrinaryLogic::createYes()
+            : parent::hasMethod($methodName);
     }
 
     public function getUnresolvedMethodPrototype(
         string $methodName,
         ClassMemberAccessAnswerer $scope,
     ): UnresolvedMethodPrototypeReflection {
-        $prototype = parent::getUnresolvedMethodPrototype($methodName, $scope);
+        $trait = $this->findTraitWithMethod($methodName);
 
-        // Wrap as public so protected TestCase methods (mock, assertDatabaseHas, etc.)
-        // are accessible inside Pest closures where PHPStan doesn't consider the
-        // scope as "inside" the TestCase class.
+        $prototype = $trait instanceof ClassReflection
+            ? new ObjectType($trait->getName())->getUnresolvedMethodPrototype($methodName, $scope)
+            : parent::getUnresolvedMethodPrototype($methodName, $scope);
+
         return new PestPublicUnresolvedMethodPrototype($prototype);
+    }
+
+    private function findTraitWithMethod(string $methodName): ?ClassReflection
+    {
+        return array_find(
+            $this->traits,
+            static fn (ClassReflection $trait) => $trait->hasMethod($methodName),
+        );
     }
 
     private function buildPropertyPrototype(string $propertyName): UnresolvedPropertyPrototypeReflection
     {
-        $declaringClass = $this->reflectionProvider->getClass(stdClass::class);
+        $declaringClass = $this->reflectionProvider->getClass($this->getClassName());
         $property = new PestPropertyReflection($this->dynamicProperties[$propertyName], $declaringClass);
         $extended = new WrappedExtendedPropertyReflection($propertyName, $property);
 

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Collection;
+use function PHPStan\Testing\assertType;
 
 /**
  * @property Collection $items
@@ -11,5 +12,5 @@ beforeEach(function () {
 });
 
 it('resolves short class names via use map', function () {
-    expect($this->items->count())->toBeInt();
+    assertType('Illuminate\Support\Collection', $this->items);
 });

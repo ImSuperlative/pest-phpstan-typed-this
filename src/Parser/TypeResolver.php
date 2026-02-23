@@ -37,7 +37,7 @@ final class TypeResolver
     {
         $typeNode = $this->typeStringParser->parseTypeString($typeString);
 
-        if ($typeNode === null) {
+        if (! $typeNode instanceof TypeNode) {
             return null;
         }
 

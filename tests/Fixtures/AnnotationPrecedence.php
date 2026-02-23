@@ -1,11 +1,11 @@
 <?php
 
 use Illuminate\Support\Collection;
+use function PHPStan\Testing\assertType;
 
 /**
  * Annotation declares $thing as ?Collection (nullable), assignment infers Collection (non-null).
  * If annotation wins, $thing is ?Collection so calling count() directly would be an error.
- * We null-check first to prove the nullable type from the annotation is in effect.
  *
  * @property ?Collection $thing
  */
@@ -15,7 +15,5 @@ beforeEach(function () {
 });
 
 it('uses annotation type over inferred type', function () {
-    if ($this->thing !== null) {
-        expect($this->thing->count())->toBeInt();
-    }
+    assertType('Illuminate\Support\Collection|null', $this->thing);
 });

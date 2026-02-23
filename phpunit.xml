@@ -3,21 +3,19 @@
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/12.0/phpunit.xsd"
          bootstrap="vendor/autoload.php"
          colors="true"
+         failOnRisky="true"
+         failOnWarning="true"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
+         displayDetailsOnTestsThatTriggerWarnings="true"
 >
     <testsuites>
         <testsuite name="Unit">
             <directory>tests/Unit</directory>
         </testsuite>
-        <testsuite name="Fixtures">
-            <directory>tests/Fixtures</directory>
+        <testsuite name="Rules">
+            <directory>tests/Rules</directory>
         </testsuite>
     </testsuites>
-    <php>
-        <env name="APP_KEY" value="base64:test1234567890123456789012345678"/>
-        <env name="DB_CONNECTION" value="sqlite"/>
-        <env name="DB_DATABASE" value=":memory:"/>
-        <env name="QUEUE_CONNECTION" value="database"/>
-    </php>
     <source>
         <include>
             <directory>src</directory>

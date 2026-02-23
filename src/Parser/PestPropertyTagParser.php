@@ -78,52 +78,45 @@ final class PestPropertyTagParser implements PropertyParserStrategy
     /**
      * Parse a `@pest-property` tag value into a [name, typeNode] pair.
      *
+     * Tokenizes once, then extracts both the type and variable name
+     * from the same token stream.
+     *
      * @return array{string, TypeNode}|null
      */
     public function parseTagValue(string $rawValue): ?array
     {
-        $typeNode = $this->parseType($rawValue);
-        $name = $this->extractVariableName($rawValue);
+        if ($rawValue === '') {
+            return null;
+        }
 
-        return $typeNode !== null && $name !== null ? [$name, $typeNode] : null;
-    }
+        $tokens = new TokenIterator($this->typeStringParser->getLexer()->tokenize($rawValue));
+        $typeNode = $this->parseType($tokens);
+        $name = $typeNode !== null ? $this->extractVariableName($tokens) : null;
 
-    private function parseType(string $rawValue): ?TypeNode
-    {
-        return $rawValue !== '' ? $this->typeStringParser->parseTypeString($rawValue) : null;
+        return $typeNode instanceof TypeNode && $name !== null ? [$name, $typeNode] : null;
     }
 
     /**
-     * Extract the `$variable` name that follows the type in a tag value.
+     * Consume and return the type from the token stream.
      */
-    public function extractVariableName(string $rawValue): ?string
+    public function parseType(TokenIterator $tokens): ?TypeNode
     {
-        $tokens = $this->tokenize($rawValue);
-
-        if ($tokens === null) {
+        try {
+            return $this->typeStringParser->getTypeParser()->parse($tokens);
+        } catch (ParserException) {
             return null;
         }
+    }
+
+    /**
+     * Extract the `$variable` name that follows the type in the token stream.
+     */
+    public function extractVariableName(TokenIterator $tokens): ?string
+    {
+        $tokens->tryConsumeTokenType(Lexer::TOKEN_HORIZONTAL_WS);
 
         return $tokens->isCurrentTokenType(Lexer::TOKEN_VARIABLE)
             ? ltrim($tokens->currentTokenValue(), '$')
             : null;
-    }
-
-    /**
-     * Tokenize the raw value, consume the type, and advance past whitespace.
-     */
-    private function tokenize(string $rawValue): ?TokenIterator
-    {
-        $tokens = new TokenIterator($this->typeStringParser->getLexer()->tokenize($rawValue));
-
-        try {
-            $this->typeStringParser->getTypeParser()->parse($tokens);
-        } catch (ParserException) {
-            return null;
-        }
-
-        $tokens->tryConsumeTokenType(Lexer::TOKEN_HORIZONTAL_WS);
-
-        return $tokens;
     }
 }

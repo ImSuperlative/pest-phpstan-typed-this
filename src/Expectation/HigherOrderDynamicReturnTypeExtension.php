@@ -25,7 +25,7 @@ use PHPStan\Type\Type;
  */
 final class HigherOrderDynamicReturnTypeExtension implements DynamicMethodReturnTypeExtension
 {
-    private const array NATIVE_METHODS = ['scoped', 'not', 'expect', 'and', 'json', '__call', '__get'];
+    // private const array NATIVE_METHODS = ['scoped', 'not', 'expect', 'and', 'json', '__call', '__get'];
 
     public function __construct(
         private ReflectionProvider $reflectionProvider,
@@ -38,7 +38,14 @@ final class HigherOrderDynamicReturnTypeExtension implements DynamicMethodReturn
 
     public function isMethodSupported(MethodReflection $methodReflection): bool
     {
-        return ! in_array($methodReflection->getName(), self::NATIVE_METHODS, true);
+        return ! $this->isNativeMethod($methodReflection->getName());
+    }
+
+    private function isNativeMethod(string $methodName): bool
+    {
+        return $this->reflectionProvider->hasClass(PestExpectationClasses::HIGHER_ORDER)
+            && $this->reflectionProvider->getClass(PestExpectationClasses::HIGHER_ORDER)
+                ->hasNativeMethod($methodName);
     }
 
     public function getTypeFromMethodCall(
@@ -49,7 +56,7 @@ final class HigherOrderDynamicReturnTypeExtension implements DynamicMethodReturn
         $callerType = $scope->getType($methodCall->var);
         $tOriginal = $this->extractOriginalValueType($callerType);
 
-        return $tOriginal !== null
+        return $tOriginal instanceof Type
             ? $this->resolveHigherOrderType($callerType, $tOriginal, $methodReflection->getName())
             : null;
     }
@@ -61,7 +68,7 @@ final class HigherOrderDynamicReturnTypeExtension implements DynamicMethodReturn
         $resolvedValue = $this->resolveAsExpectationMethod($methodName, $tValue)
             ?? PestExpectationClasses::resolveMethodReturnType($tValue, $methodName)
             ?? PestExpectationClasses::resolvePropertyType($tValue, $methodName)
-            ?? new MixedType();
+            ?? new MixedType;
 
         return new GenericObjectType(PestExpectationClasses::HIGHER_ORDER, [$tOriginal, $resolvedValue]);
     }

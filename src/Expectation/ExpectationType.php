@@ -14,8 +14,6 @@ use PHPStan\TrinaryLogic;
 use PHPStan\Type\Generic\GenericObjectType;
 use PHPStan\Type\Type;
 use PHPStan\Type\VerbosityLevel;
-use stdClass;
-
 /**
  * Custom GenericObjectType for Pest\Expectation that resolves property access
  * on the underlying TValue type.
@@ -58,7 +56,7 @@ final class ExpectationType extends GenericObjectType
     ): UnresolvedPropertyPrototypeReflection {
         $propertyType = $this->resolveValuePropertyType($propertyName);
 
-        return $propertyType !== null
+        return $propertyType instanceof Type
             ? $this->buildHigherOrderPropertyPrototype($propertyType)
             : parent::getUnresolvedPropertyPrototype($propertyName, $scope);
     }
@@ -69,7 +67,7 @@ final class ExpectationType extends GenericObjectType
     ): UnresolvedPropertyPrototypeReflection {
         $propertyType = $this->resolveValuePropertyType($propertyName);
 
-        return $propertyType !== null
+        return $propertyType instanceof Type
             ? $this->buildHigherOrderPropertyPrototype($propertyType)
             : parent::getUnresolvedInstancePropertyPrototype($propertyName, $scope);
     }
@@ -94,7 +92,7 @@ final class ExpectationType extends GenericObjectType
             [$expectationType, $propertyType]
         );
 
-        $declaringClass = $this->reflectionProvider->getClass(stdClass::class);
+        $declaringClass = $this->reflectionProvider->getClass(PestExpectationClasses::EXPECTATION);
         $property = new PestPropertyReflection($higherOrderType, $declaringClass);
         $extended = new WrappedExtendedPropertyReflection('property', $property);
 

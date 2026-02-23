@@ -1,5 +1,7 @@
 <?php
 
+use function PHPStan\Testing\assertType;
+
 /**
  * @property stdClass $object
  */
@@ -9,5 +11,5 @@ beforeEach(function () {
 });
 
 test('typed property works in test() function', function () {
-    expect($this->object)->toBeObject();
+    assertType('stdClass', $this->object);
 });

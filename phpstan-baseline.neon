@@ -1,6 +1,12 @@
 parameters:
 	ignoreErrors:
 		-
+			message: '#^Creating new PHPStan\\Reflection\\WrappedExtendedPropertyReflection is not covered by backward compatibility promise\. The class might change in a minor PHPStan version\.$#'
+			identifier: phpstanApi.constructor
+			count: 1
+			path: src/Expectation/ExpectationType.php
+
+		-
 			message: '#^Calling PHPStan\\PhpDoc\\PhpDocStringResolver\:\:resolve\(\) is not covered by backward compatibility promise\. The method might change in a minor PHPStan version\.$#'
 			identifier: phpstanApi.method
 			count: 1
@@ -13,20 +19,8 @@ parameters:
 			path: src/Parser/PhpDocPropertyParser.php
 
 		-
-			message: '#^Creating new PHPStan\\Reflection\\WrappedExtendedPropertyReflection is not covered by backward compatibility promise\. The class might change in a minor PHPStan version\.$#'
-			identifier: phpstanApi.constructor
-			count: 1
-			path: src/TypedThis/TestCaseType.php
-
-		-
 			message: '#^Implementing PHPStan\\Reflection\\ExtendedMethodReflection is not covered by backward compatibility promise\. The interface might change in a minor PHPStan version\.$#'
 			identifier: phpstanApi.interface
-			count: 1
-			path: src/Reflection/PestPublicExtendedMethodReflection.php
-
-		-
-			message: '#^Return type \(list\<PHPStan\\BetterReflection\\Reflection\\ReflectionAttribute\>\) of method ImSuperlative\\PestPhpstanTypedThis\\Reflection\\PestPublicExtendedMethodReflection\:\:getAttributes\(\) should be compatible with return type \(list\<PHPStan\\Reflection\\AttributeReflection\>\) of method PHPStan\\Reflection\\ExtendedMethodReflection\:\:getAttributes\(\)$#'
-			identifier: method.childReturnType
 			count: 1
 			path: src/Reflection/PestPublicExtendedMethodReflection.php
 
@@ -45,6 +39,12 @@ parameters:
 		-
 			message: '#^Method ImSuperlative\\PestPhpstanTypedThis\\Reflection\\PestPublicExtendedMethodReflection\:\:isBuiltin\(\) should return PHPStan\\TrinaryLogic but returns bool\|PHPStan\\TrinaryLogic\.$#'
 			identifier: return.type
+			count: 1
+			path: src/Reflection/PestPublicExtendedMethodReflection.php
+
+		-
+			message: '#^Return type \(list\<PHPStan\\BetterReflection\\Reflection\\ReflectionAttribute\>\) of method ImSuperlative\\PestPhpstanTypedThis\\Reflection\\PestPublicExtendedMethodReflection\:\:getAttributes\(\) should be compatible with return type \(list\<PHPStan\\Reflection\\AttributeReflection\>\) of method PHPStan\\Reflection\\ExtendedMethodReflection\:\:getAttributes\(\)$#'
+			identifier: method.childReturnType
 			count: 1
 			path: src/Reflection/PestPublicExtendedMethodReflection.php
 
@@ -83,3 +83,9 @@ parameters:
 			identifier: phpstanApi.interface
 			count: 1
 			path: src/Reflection/PestUnresolvedPropertyPrototype.php
+
+		-
+			message: '#^Creating new PHPStan\\Reflection\\WrappedExtendedPropertyReflection is not covered by backward compatibility promise\. The class might change in a minor PHPStan version\.$#'
+			identifier: phpstanApi.constructor
+			count: 1
+			path: src/TypedThis/TestCaseType.php

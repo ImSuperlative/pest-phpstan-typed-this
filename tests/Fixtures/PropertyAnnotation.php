@@ -1,5 +1,7 @@
 <?php
 
+use function PHPStan\Testing\assertType;
+
 /**
  * @property stdClass $object
  * @property ?stdClass $nullableObject
@@ -11,9 +13,9 @@ beforeEach(function () {
 });
 
 it('reads typed property from annotation', function () {
-    expect($this->object)->toBeObject();
+    assertType('stdClass', $this->object);
 });
 
 it('reads nullable property from annotation', function () {
-    expect($this->nullableObject)->toBeNull();
+    assertType('stdClass|null', $this->nullableObject);
 });

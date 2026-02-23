@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ImSuperlative\PestPhpstanTypedThis\Parser;
 
+use PhpParser\Node\Expr;
+use PhpParser\Node\Identifier;
 use ImSuperlative\PestPhpstanTypedThis\Parser\Concerns\FirstOccurrenceFilterTrait;
 use ImSuperlative\PestPhpstanTypedThis\Parser\Contracts\PropertyParserStrategy;
 use PhpParser\Node;
@@ -34,7 +36,7 @@ final class AssignmentInferenceParser implements PropertyParserStrategy
     }
 
     /**
-     * @param  array<string, Node\Expr>  $assignments
+     * @param  array<string, Expr>  $assignments
      * @return array<string, Type>
      */
     public function resolveTypes(array $assignments, string $filePath): array
@@ -43,7 +45,7 @@ final class AssignmentInferenceParser implements PropertyParserStrategy
 
         return array_filter(
             array_map(
-                fn (Node\Expr $expr): Type => $this->initializerExprTypeResolver->getType($expr, $context),
+                fn (Expr $expr): Type => $this->initializerExprTypeResolver->getType($expr, $context),
                 $assignments,
             ),
             static fn (Type $type): bool => ! $type instanceof ErrorType,
@@ -54,7 +56,7 @@ final class AssignmentInferenceParser implements PropertyParserStrategy
      * Find all `$this->prop = expr` assignments, keeping only the first per property.
      *
      * @param  Node\Stmt[]  $stmts
-     * @return array<string, Node\Expr> property name => assigned expression
+     * @return array<string, Expr> property name => assigned expression
      */
     public function findThisAssignments(array $stmts): array
     {
@@ -86,12 +88,12 @@ final class AssignmentInferenceParser implements PropertyParserStrategy
     /**
      * If $expr is `$this->propertyName`, return the property name. Otherwise null.
      */
-    public function extractThisPropertyName(Node\Expr $expr): ?string
+    public function extractThisPropertyName(Expr $expr): ?string
     {
         if (! $expr instanceof PropertyFetch
             || ! $expr->var instanceof Variable
             || $expr->var->name !== 'this'
-            || ! $expr->name instanceof Node\Identifier
+            || ! $expr->name instanceof Identifier
         ) {
             return null;
         }

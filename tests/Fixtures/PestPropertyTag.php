@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Collection;
+use function PHPStan\Testing\assertType;
 
 /**
  * @pest-property Collection $items
@@ -13,6 +14,6 @@ beforeEach(function () {
 });
 
 it('reads @pest-property typed properties', function () {
-    expect($this->items->count())->toBeInt();
-    expect($this->name)->toBeString();
+    assertType('Illuminate\Support\Collection', $this->items);
+    assertType('string', $this->name);
 });

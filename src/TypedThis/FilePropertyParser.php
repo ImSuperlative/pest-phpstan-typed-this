@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace ImSuperlative\PestPhpstanTypedThis\TypedThis;
 
+use ImSuperlative\PestPhpstanTypedThis\Concerns\CanParseStatements;
 use ImSuperlative\PestPhpstanTypedThis\Parser\Contracts\PropertyParserStrategy;
 use PhpParser\Node;
 use PhpParser\Node\UseItem;
 use PhpParser\NodeFinder;
-use PhpParser\NodeTraverser;
-use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\Parser;
 use PHPStan\Type\Type;
 
 final class FilePropertyParser
 {
+    use CanParseStatements;
+
     /** @var array<string, array<string, Type>> */
     private array $cache = [];
 
@@ -23,7 +24,12 @@ final class FilePropertyParser
         private readonly array $strategies,
         private readonly Parser $parser,
         private readonly NodeFinder $nodeFinder,
-    ) {
+        private readonly UsesParser $usesParser,
+    ) {}
+
+    private function getParser(): Parser
+    {
+        return $this->parser;
     }
 
     /** @return array<string, Type> property name => type */
@@ -32,38 +38,36 @@ final class FilePropertyParser
         return $this->cache[$filePath] ??= $this->parseFile($filePath);
     }
 
+    /**
+     * Parse uses/extend from the file itself only.
+     *
+     * @return list<class-string>
+     */
+    public function parseUses(string $filePath): array
+    {
+        $stmts = $this->parseStatements($filePath);
+
+        return $stmts !== null ? $this->usesParser->parse($filePath, $stmts) : [];
+    }
+
+    /**
+     * Parse uses from the file itself and from parent Pest.php files.
+     *
+     * @return list<class-string>
+     */
+    public function parseUsesWithParents(string $filePath): array
+    {
+        return $this->usesParser->parseWithParents($filePath);
+    }
+
     /** @return array<string, Type> */
     private function parseFile(string $filePath): array
     {
         $stmts = $this->parseStatements($filePath);
 
-        if ($stmts === null) {
-            return [];
-        }
-
-        return $this->runStrategies($stmts, $filePath);
-    }
-
-    /** @return Node\Stmt[]|null */
-    private function parseStatements(string $filePath): ?array
-    {
-        $content = file_get_contents($filePath);
-        $stmts = $content !== false ? $this->parser->parse($content) : null;
-
-        return $stmts !== null ? $this->resolveNames($stmts) : null;
-    }
-
-    /**
-     * @param  Node\Stmt[]  $stmts
-     * @return Node\Stmt[]
-     */
-    private function resolveNames(array $stmts): array
-    {
-        $traverser = new NodeTraverser;
-        $traverser->addVisitor(new NameResolver);
-
-        /** @var Node\Stmt[] */
-        return $traverser->traverse($stmts);
+        return $stmts === null
+            ? []
+            : $this->runStrategies($stmts, $filePath);
     }
 
     /**

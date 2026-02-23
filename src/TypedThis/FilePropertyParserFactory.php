@@ -18,6 +18,7 @@ final readonly class FilePropertyParserFactory
         private AssignmentInferenceParser $assignmentParser,
         private Parser $parser,
         private NodeFinder $nodeFinder,
+        private UsesParser $usesParser,
         private bool $parsePestPropertyTags = false,
         private bool $parsePhpDocProperties = false,
         private bool $parseAssignments = true,
@@ -32,7 +33,8 @@ final readonly class FilePropertyParserFactory
                 $this->parseAssignments ? $this->assignmentParser : null,
             ]),
             $this->parser,
-            $this->nodeFinder
+            $this->nodeFinder,
+            $this->usesParser,
         );
     }
 }

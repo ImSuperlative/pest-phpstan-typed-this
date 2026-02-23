@@ -1,5 +1,7 @@
 <?php
 
+use function PHPStan\Testing\assertType;
+
 /**
  * @property stdClass $object
  */
@@ -10,6 +12,6 @@ beforeEach(function () {
 
 describe('nested group', function () {
     it('has access to typed properties in describe block', function () {
-        expect($this->object)->toBeObject();
+        assertType('stdClass', $this->object);
     });
 });

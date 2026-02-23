@@ -43,12 +43,12 @@ final class DynamicReturnTypeExtension implements DynamicMethodReturnTypeExtensi
         $valueType = $this->extractValueType($callerType);
         $methodName = $methodReflection->getName();
 
-        $resolvedType = $valueType !== null
+        $resolvedType = $valueType instanceof Type
             ? PestExpectationClasses::resolvePropertyType($valueType, $methodName)
                 ?? PestExpectationClasses::resolveMethodReturnType($valueType, $methodName)
             : null;
 
-        return $resolvedType !== null
+        return $resolvedType instanceof Type
             ? $this->buildHigherOrderType($callerType, $resolvedType)
             : null;
     }

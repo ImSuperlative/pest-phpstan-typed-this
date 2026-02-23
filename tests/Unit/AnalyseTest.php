@@ -2,187 +2,150 @@
 
 /** @noinspection StaticClosureCanBeUsedInspection */
 
-use Symfony\Component\Process\Process;
+use ImSuperlative\PestPhpstanTypedThis\Tests\AnalysesFixtures;
+use ImSuperlative\PestPhpstanTypedThis\Tests\TypeInferenceTestCase;
+
+uses(AnalysesFixtures::class);
+
+$fixtureDir = __DIR__.'/../Fixtures';
+$configFile = __DIR__.'/../phpstan-test.neon';
 
 /**
- * @return array{exitCode: int, output: string, errors: array<string, mixed>}
- */
-function analyseFixture(string $fixture, string $config = 'phpstan-test.neon'): array
-{
-    $fixturePath = dirname(__DIR__).'/Fixtures/'.$fixture;
-    $configPath = dirname(__DIR__).'/'.$config;
-    $phpstanBin = dirname(__DIR__, 2).'/vendor/bin/phpstan';
-
-    $process = new Process([
-        $phpstanBin,
-        'analyse',
-        '--no-progress',
-        '--error-format=json',
-        '--configuration='.$configPath,
-        $fixturePath,
-    ]);
-    $process->run();
-
-    if ($process->getExitCode() > 1) {
-        throw new RuntimeException(sprintf(
-            'PHPStan crashed (exit code %d):\n%s',
-            $process->getExitCode(),
-            $process->getErrorOutput(),
-        ));
-    }
-
-    $json = json_decode($process->getOutput(), true) ?? [];
-
-    return [
-        'exitCode' => (int) $process->getExitCode(),
-        'output' => $process->getOutput(),
-        'errors' => $json['files'] ?? [],
-    ];
-}
-
-/**
- * Extract error messages from PHPStan JSON output.
+ * Run type inference assertions for a fixture file.
  *
- * @param  array{exitCode: int, output: string, errors: array<string, mixed>}  $result
- * @return array<string>
+ * @param  list<string>  $configFiles
  */
-function getErrorMessages(array $result): array
+function assertTypeInference(string $fixtureFile, array $configFiles): void
 {
-    $messages = [];
-    foreach ($result['errors'] as $file) {
-        foreach ($file['messages'] as $message) {
-            $messages[] = $message['message'];
-        }
-    }
+    TypeInferenceTestCase::setConfigFiles($configFiles);
 
-    return $messages;
+    /** @var TypeInferenceTestCase $testCase */
+    $testCase = test();
+
+    foreach (TypeInferenceTestCase::assertTypesForFile($fixtureFile) as $assert) {
+        $assertType = array_shift($assert);
+        $file = array_shift($assert);
+        $testCase->assertFileAsserts($assertType, $file, ...$assert);
+    }
 }
 
-it('passes with @property annotations', function () {
-    $result = analyseFixture('PropertyAnnotation.php');
-
-    expect($result['exitCode'])->toBe(0);
+it('passes with @property annotations', function () use ($fixtureDir, $configFile) {
+    assertTypeInference("$fixtureDir/PropertyAnnotation.php", [$configFile]);
 });
 
-it('infers types from new expressions', function () {
-    $result = analyseFixture('NewInference.php');
-
-    expect($result['exitCode'])->toBe(0);
+it('infers types from new expressions', function () use ($fixtureDir, $configFile) {
+    assertTypeInference("$fixtureDir/NewInference.php", [$configFile]);
 });
 
-it('resolves short class names via use map', function () {
-    $result = analyseFixture('UseMapResolution.php');
-
-    expect($result['exitCode'])->toBe(0);
+it('resolves short class names via use map', function () use ($fixtureDir, $configFile) {
+    assertTypeInference("$fixtureDir/UseMapResolution.php", [$configFile]);
 });
 
-it('gives annotation precedence over inferred types', function () {
-    $result = analyseFixture('AnnotationPrecedence.php');
-
-    expect($result['exitCode'])->toBe(0);
+it('gives annotation precedence over inferred types', function () use ($fixtureDir, $configFile) {
+    assertTypeInference("$fixtureDir/AnnotationPrecedence.php", [$configFile]);
 });
 
-it('allows writing to typed properties', function () {
-    $result = analyseFixture('WritableProperty.php');
-
-    expect($result['exitCode'])->toBe(0);
+it('allows writing to typed properties', function () use ($fixtureDir, $configFile) {
+    assertTypeInference("$fixtureDir/WritableProperty.php", [$configFile]);
 });
 
-it('works without any dynamic properties', function () {
-    $result = analyseFixture('NoProperties.php');
-
-    expect($result['exitCode'])->toBe(0);
+it('works without any dynamic properties', function () use ($fixtureDir, $configFile) {
+    assertTypeInference("$fixtureDir/NoProperties.php", [$configFile]);
 });
 
-it('reports errors for undefined properties', function () {
-    $result = analyseFixture('UndefinedProperty.php');
-    $messages = getErrorMessages($result);
-
-    expect($result['exitCode'])->toBe(1)
-        ->and($messages[0])->toContain('undefined property');
+it('types $this in test() function', function () use ($fixtureDir, $configFile) {
+    assertTypeInference("$fixtureDir/TestFunction.php", [$configFile]);
 });
 
-it('types $this in test() function', function () {
-    $result = analyseFixture('TestFunction.php');
-
-    expect($result['exitCode'])->toBe(0);
+it('types $this inside describe blocks', function () use ($fixtureDir, $configFile) {
+    assertTypeInference("$fixtureDir/DescribeBlock.php", [$configFile]);
 });
 
-it('types $this inside describe blocks', function () {
-    $result = analyseFixture('DescribeBlock.php');
-
-    expect($result['exitCode'])->toBe(0);
+it('types $this in all hook functions', function () use ($fixtureDir, $configFile) {
+    assertTypeInference("$fixtureDir/HookFunctions.php", [$configFile]);
 });
 
-it('types $this in all hook functions', function () {
-    $result = analyseFixture('HookFunctions.php');
-
-    expect($result['exitCode'])->toBe(0);
+it('infers scalar types from assignments', function () use ($fixtureDir, $configFile) {
+    assertTypeInference("$fixtureDir/ScalarInference.php", [$configFile]);
 });
 
-it('reports errors for type mismatches on typed properties', function () {
-    $result = analyseFixture('TypeMismatch.php');
-
-    expect($result['exitCode'])->toBe(1);
+it('handles multiple properties with different types', function () use ($fixtureDir, $configFile) {
+    assertTypeInference("$fixtureDir/MultipleProperties.php", [$configFile]);
 });
 
-it('infers scalar types from assignments', function () {
-    $result = analyseFixture('ScalarInference.php');
-
-    expect($result['exitCode'])->toBe(0);
+it('resolves use imports in inferred types', function () use ($fixtureDir, $configFile) {
+    assertTypeInference("$fixtureDir/UseMapInference.php", [$configFile]);
 });
 
-it('handles multiple properties with different types', function () {
-    $result = analyseFixture('MultipleProperties.php');
-
-    expect($result['exitCode'])->toBe(0);
+it('parses @pest-property custom tags', function () use ($fixtureDir, $configFile) {
+    assertTypeInference("$fixtureDir/PestPropertyTag.php", [$configFile]);
 });
 
-it('resolves use imports in inferred types', function () {
-    $result = analyseFixture('UseMapInference.php');
-
-    expect($result['exitCode'])->toBe(0);
-});
-
-it('parses @pest-property custom tags', function () {
-    $result = analyseFixture('PestPropertyTag.php');
-
-    expect($result['exitCode'])->toBe(0);
-});
-
-it('gives @pest-property precedence over @property', function () {
-    $result = analyseFixture('PestPropertyPrecedence.php');
-
-    expect($result['exitCode'])->toBe(0);
-});
-
-it('ignores @property when parsePhpDocProperties is disabled', function () {
-    $result = analyseFixture('DisabledPhpDocParser.php', 'phpstan-test-defaults.neon');
-
-    expect($result['exitCode'])->toBe(0);
-});
-
-it('applies @property when parsePhpDocProperties is enabled', function () {
-    $result = analyseFixture('DisabledPhpDocParser.php');
-
-    expect($result['exitCode'])->toBe(1);
+it('gives @pest-property precedence over @property', function () use ($fixtureDir, $configFile) {
+    assertTypeInference("$fixtureDir/PestPropertyPrecedence.php", [$configFile]);
 });
 
 it('allows dynamic methods on Pest Expectation', function () {
-    $result = analyseFixture('ExpectationExtension.php');
-
-    expect($result['exitCode'])->toBe(0);
+    expect($this->analyseFixture('ExpectationExtension.php')['exitCode'])
+        ->toBe(0);
 });
 
 it('allows higher-order property access on expectations', function () {
-    $result = analyseFixture('ExpectationPropertyAccess.php');
+    expect($this->analyseFixture('ExpectationPropertyAccess.php')['exitCode'])
+        ->toBe(0);
+});
 
-    expect($result['exitCode'])->toBe(0);
+describe('uses() trait resolution', function () use ($fixtureDir, $configFile) {
+    it('resolves trait methods from uses()', function () use ($fixtureDir, $configFile) {
+        assertTypeInference("$fixtureDir/UsesResolution/UsesFunction.php", [$configFile]);
+    });
+
+    it('resolves trait methods from pest()->extend()', function () use ($fixtureDir, $configFile) {
+        assertTypeInference("$fixtureDir/UsesResolution/PestExtend.php", [$configFile]);
+    });
+
+    it('resolves trait methods from pest()->extends()', function () use ($fixtureDir, $configFile) {
+        assertTypeInference("$fixtureDir/UsesResolution/PestExtends.php", [$configFile]);
+    });
+
+    it('resolves trait methods from pest()->use()', function () use ($fixtureDir, $configFile) {
+        assertTypeInference("$fixtureDir/UsesResolution/PestUse.php", [$configFile]);
+    });
+
+    it('resolves trait methods from pest()->uses()', function () use ($fixtureDir, $configFile) {
+        assertTypeInference("$fixtureDir/UsesResolution/PestUses.php", [$configFile]);
+    });
+
+    it('resolves trait methods from pest()->group()->extend()', function () use ($fixtureDir, $configFile) {
+        assertTypeInference("$fixtureDir/UsesResolution/PestGroupExtend.php", [$configFile]);
+    });
+});
+
+// --- Error-expecting tests (subprocess-based) ---
+
+it('reports errors for undefined properties', function () {
+    $result = $this->analyseFixture('UndefinedProperty.php');
+
+    expect($result['exitCode'])->toBe(1)
+        ->and($result['messages'][0])->toContain('undefined property');
+});
+
+it('reports errors for type mismatches on typed properties', function () {
+    expect($this->analyseFixture('TypeMismatch.php')['exitCode'])
+        ->toBe(1);
+});
+
+it('ignores @property when parsePhpDocProperties is disabled', function () {
+    expect($this->analyseFixture('DisabledPhpDocParser.php', 'phpstan-test-defaults.neon')['exitCode'])
+        ->toBe(0);
+});
+
+it('applies @property when parsePhpDocProperties is enabled', function () {
+    expect($this->analyseFixture('DisabledPhpDocParser.php')['exitCode'])
+        ->toBe(1);
 });
 
 it('falls back gracefully when expectationPropertyAccess is disabled', function () {
-    $result = analyseFixture('ExpectationPropertyAccess.php', 'phpstan-test-no-property-access.neon');
-
-    expect($result['exitCode'])->toBe(1);
+    expect($this->analyseFixture('ExpectationPropertyAccess.php', 'phpstan-test-no-property-access.neon')['exitCode'])
+        ->toBe(1);
 });
-

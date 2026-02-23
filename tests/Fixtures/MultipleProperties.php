@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Collection;
+use function PHPStan\Testing\assertType;
 
 /**
  * @property string $name
@@ -15,7 +16,7 @@ beforeEach(function () {
 });
 
 it('handles multiple properties with different types', function () {
-    expect($this->name)->toBeString()
-        ->and($this->age)->toBeInt()
-        ->and($this->items->count())->toBeInt();
+    assertType('string', $this->name);
+    assertType('int', $this->age);
+    assertType('Illuminate\Support\Collection', $this->items);
 });

@@ -4,6 +4,8 @@ parametersSchema:
         parsePestPropertyTags: bool()
         parsePhpDocProperties: bool()
         parseAssignments: bool()
+        parseUses: bool()
+        parseParentUses: bool()
         expectationPropertyAccess: bool()
     ])
 
@@ -13,6 +15,8 @@ parameters:
         parsePestPropertyTags: false
         parsePhpDocProperties: false
         parseAssignments: true
+        parseUses: true
+        parseParentUses: true
         expectationPropertyAccess: true
 
     #universalObjectCratesClasses:
@@ -28,6 +32,21 @@ services:
 
     -
         class: PhpParser\NodeFinder
+
+    -
+        class: ImSuperlative\PestPhpstanTypedThis\TypedThis\PestFileLocator
+        arguments:
+            currentWorkingDirectory: %currentWorkingDirectory%
+
+    -
+        class: ImSuperlative\PestPhpstanTypedThis\TypedThis\PestFileCacheMetaExtension
+        arguments:
+            currentWorkingDirectory: %currentWorkingDirectory%
+        tags:
+            - phpstan.resultCacheMetaExtension
+
+    -
+        class: ImSuperlative\PestPhpstanTypedThis\TypedThis\UsesParser
 
     -
         class: ImSuperlative\PestPhpstanTypedThis\Parser\TypeStringParser
@@ -61,6 +80,8 @@ services:
         class: ImSuperlative\PestPhpstanTypedThis\TypedThis\ClosureThisExtension
         arguments:
             testCaseClass: %pestPhpstanTypedThis.testCaseClass%
+            parseUses: %pestPhpstanTypedThis.parseUses%
+            parseParentUses: %pestPhpstanTypedThis.parseParentUses%
         tags:
             - phpstan.functionParameterClosureThisExtension
 
@@ -84,6 +105,31 @@ services:
         class: ImSuperlative\PestPhpstanTypedThis\Expectation\HigherOrderDynamicReturnTypeExtension
         tags:
             - phpstan.broker.dynamicMethodReturnTypeExtension
+
+    -
+        class: ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToBeBooleanRule
+        tags:
+            - phpstan.rules.rule
+
+    -
+        class: ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToBeNullRule
+        tags:
+            - phpstan.rules.rule
+
+    -
+        class: ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToHaveCountZeroRule
+        tags:
+            - phpstan.rules.rule
+
+    -
+        class: ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToBeEmptyRule
+        tags:
+            - phpstan.rules.rule
+
+    -
+        class: ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToHaveLengthZeroRule
+        tags:
+            - phpstan.rules.rule
 
 conditionalTags:
     ImSuperlative\PestPhpstanTypedThis\Expectation\ExpectFunctionReturnTypeExtension:

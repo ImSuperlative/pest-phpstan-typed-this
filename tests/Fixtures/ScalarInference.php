@@ -1,5 +1,7 @@
 <?php
 
+use function PHPStan\Testing\assertType;
+
 beforeEach(function () {
     $this->name = 'hello';
     $this->count = 42;
@@ -7,7 +9,7 @@ beforeEach(function () {
 });
 
 it('infers scalar types from assignments', function () {
-    expect($this->name)->toBeString()
-        ->and($this->count)->toBeInt()
-        ->and($this->items)->toBeArray();
+    assertType("'hello'", $this->name);
+    assertType('42', $this->count);
+    assertType('array{1, 2, 3}', $this->items);
 });

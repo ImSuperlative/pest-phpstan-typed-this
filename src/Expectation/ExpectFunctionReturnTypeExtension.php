@@ -33,7 +33,7 @@ final class ExpectFunctionReturnTypeExtension implements DynamicFunctionReturnTy
         Scope $scope,
     ): ?Type {
         $args = $functionCall->getArgs();
-        if (empty($args)) {
+        if ($args === []) {
             return null;
         }
 

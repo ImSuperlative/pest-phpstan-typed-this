@@ -20,14 +20,14 @@ final class PestExpectationClasses
     public static function resolvePropertyType(Type $type, string $name): ?Type
     {
         return $type->hasProperty($name)->yes()
-            ? $type->getProperty($name, new OutOfClassScope())->getReadableType()
+            ? $type->getProperty($name, new OutOfClassScope)->getReadableType()
             : null;
     }
 
     public static function resolveMethodReturnType(Type $type, string $name): ?Type
     {
         return $type->hasMethod($name)->yes()
-            ? $type->getMethod($name, new OutOfClassScope())->getVariants()[0]->getReturnType()
+            ? $type->getMethod($name, new OutOfClassScope)->getVariants()[0]->getReturnType()
             : null;
     }
 }

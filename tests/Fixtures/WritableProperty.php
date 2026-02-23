@@ -1,5 +1,7 @@
 <?php
 
+use function PHPStan\Testing\assertType;
+
 /**
  * @property stdClass $case
  */
@@ -10,5 +12,5 @@ beforeEach(function () {
 
 it('allows writing to typed properties', function () {
     $this->case = new stdClass();
-    expect($this->case)->toBeObject();
+    assertType('stdClass', $this->case);
 });

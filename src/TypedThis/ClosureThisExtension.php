@@ -6,6 +6,7 @@ namespace ImSuperlative\PestPhpstanTypedThis\TypedThis;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
+use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\FunctionReflection;
 use PHPStan\Reflection\ParameterReflection;
 use PHPStan\Reflection\ReflectionProvider;
@@ -29,12 +30,16 @@ final class ClosureThisExtension implements FunctionParameterClosureThisExtensio
         'test',
         'describe',
         'beforeEach',
+        'beforeAll',
         'afterEach',
+        'afterAll',
         'Pest\it',
         'Pest\test',
         'Pest\describe',
         'Pest\beforeEach',
+        'Pest\beforeAll',
         'Pest\afterEach',
+        'Pest\afterAll',
     ];
 
     /** @param  class-string  $testCaseClass */
@@ -42,8 +47,9 @@ final class ClosureThisExtension implements FunctionParameterClosureThisExtensio
         private FilePropertyParser $parser,
         private ReflectionProvider $reflectionProvider,
         private string $testCaseClass = 'PHPUnit\Framework\TestCase',
-    ) {
-    }
+        private bool $parseUses = true,
+        private bool $parseParentUses = true,
+    ) {}
 
     public function isFunctionSupported(FunctionReflection $functionReflection, ParameterReflection $parameter): bool
     {
@@ -56,8 +62,42 @@ final class ClosureThisExtension implements FunctionParameterClosureThisExtensio
         ParameterReflection $parameter,
         Scope $scope
     ): Type {
-        $properties = $this->parser->parse($scope->getFile());
+        $filePath = $scope->getFile();
 
-        return new TestCaseType($this->testCaseClass, $properties, $this->reflectionProvider);
+        return new TestCaseType(
+            $this->testCaseClass,
+            $this->parser->parse($filePath),
+            $this->reflectionProvider,
+            $this->resolveTraits($filePath),
+        );
+    }
+
+    /**
+     * @return list<ClassReflection>
+     */
+    private function resolveTraits(string $filePath): array
+    {
+        if (! $this->parseUses && ! $this->parseParentUses) {
+            return [];
+        }
+
+        $classes = $this->parseParentUses
+            ? $this->parser->parseUsesWithParents($filePath)
+            : $this->parser->parseUses($filePath);
+
+        return array_values(array_filter(
+            array_map(fn (string $class) => $this->reflectIfTrait($class), $classes),
+        ));
+    }
+
+    private function reflectIfTrait(string $className): ?ClassReflection
+    {
+        if (! $this->reflectionProvider->hasClass($className)) {
+            return null;
+        }
+
+        $reflection = $this->reflectionProvider->getClass($className);
+
+        return $reflection->isTrait() ? $reflection : null;
     }
 }

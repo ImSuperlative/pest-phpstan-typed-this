@@ -1,5 +1,7 @@
 <?php
 
+use function PHPStan\Testing\assertType;
+
 /**
  * @property stdClass $object
  */
@@ -9,9 +11,9 @@ beforeEach(function () {
 });
 
 afterEach(function () {
-    $this->object = new stdClass();
+    assertType('stdClass', $this->object);
 });
 
 it('has typed properties across hooks', function () {
-    expect($this->object)->toBeObject();
+    assertType('stdClass', $this->object);
 });
