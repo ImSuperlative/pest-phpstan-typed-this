@@ -7,6 +7,11 @@ parametersSchema:
         parseUses: bool()
         parseParentUses: bool()
         expectationPropertyAccess: bool()
+        simplifyToBe: bool()
+        simplifyToBeNull: bool()
+        simplifyToBeEmpty: bool()
+        simplifyToHaveCount: bool()
+        simplifyToHaveLength: bool()
     ])
 
 parameters:
@@ -18,6 +23,12 @@ parameters:
         parseUses: true
         parseParentUses: true
         expectationPropertyAccess: true
+        # Rules
+        simplifyToBe: true
+        simplifyToBeNull: true
+        simplifyToBeEmpty: true
+        simplifyToHaveCount: true
+        simplifyToHaveLength: true
 
     #universalObjectCratesClasses:
     #    - Pest\Support\HigherOrderTapProxy
@@ -108,30 +119,30 @@ services:
 
     -
         class: ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToBeBooleanRule
-        tags:
-            - phpstan.rules.rule
 
     -
         class: ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToBeNullRule
-        tags:
-            - phpstan.rules.rule
 
     -
         class: ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToHaveCountZeroRule
-        tags:
-            - phpstan.rules.rule
 
     -
         class: ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToBeEmptyRule
-        tags:
-            - phpstan.rules.rule
 
     -
         class: ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToHaveLengthZeroRule
-        tags:
-            - phpstan.rules.rule
 
 conditionalTags:
+    ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToBeBooleanRule:
+        phpstan.rules.rule: %pestPhpstanTypedThis.simplifyToBe%
+    ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToBeNullRule:
+        phpstan.rules.rule: %pestPhpstanTypedThis.simplifyToBeNull%
+    ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToHaveCountZeroRule:
+        phpstan.rules.rule: %pestPhpstanTypedThis.simplifyToHaveCount%
+    ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToBeEmptyRule:
+        phpstan.rules.rule: %pestPhpstanTypedThis.simplifyToBeEmpty%
+    ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToHaveLengthZeroRule:
+        phpstan.rules.rule: %pestPhpstanTypedThis.simplifyToHaveLength%
     ImSuperlative\PestPhpstanTypedThis\Expectation\ExpectFunctionReturnTypeExtension:
         phpstan.broker.dynamicFunctionReturnTypeExtension: %pestPhpstanTypedThis.expectationPropertyAccess%
     ImSuperlative\PestPhpstanTypedThis\Expectation\PropertyExtension:

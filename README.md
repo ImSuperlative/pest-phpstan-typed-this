@@ -36,6 +36,11 @@ parameters:
         parseUses: true                            # Resolve uses()/pest()->extend() traits
         parseParentUses: true                      # Walk up for parent Pest.php files
         expectationPropertyAccess: true            # Higher-order property access on expect()
+        simplifyToBe: true                        # ->toBe(true/false) → ->toBeTrue/False()
+        simplifyToBeNull: true                    # ->toBe(null) → ->toBeNull()
+        simplifyToBeEmpty: true                   # ->toBe('')/->toBe([]) → ->toBeEmpty()
+        simplifyToHaveCount: true                 # ->toHaveCount(0) → ->toBeEmpty()
+        simplifyToHaveLength: true                # ->toHaveLength(0) → ->toBeEmpty()
 ```
 
 If your project extends the base TestCase (e.g. in Laravel with Testbench), point `testCaseClass` to your own class:
