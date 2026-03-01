@@ -36,6 +36,8 @@ parameters:
         parseUses: true                            # Resolve uses()/pest()->extend() traits
         parseParentUses: true                      # Walk up for parent Pest.php files
         expectationPropertyAccess: true            # Higher-order property access on expect()
+        expectationSequenceTypes: false            # Typed closures in ->sequence()
+        expectationScopedTypes: false              # Typed closures in ->scoped()
         simplifyToBe: true                        # ->toBe(true/false) → ->toBeTrue/False()
         simplifyToBeNull: true                    # ->toBe(null) → ->toBeNull()
         simplifyToBeEmpty: true                   # ->toBe('')/->toBe([]) → ->toBeEmpty()

@@ -40,6 +40,43 @@ expect(['a' => 1])->toBeArray()
     ->toHaveKey('a');
 ```
 
+## Sequence closure typing
+
+`expectationSequenceTypes: true` (default) types the callback parameters in `->sequence()` based on the iterable value type:
+
+```php
+use Illuminate\Support\Collection;
+
+it('types sequence callbacks', function () {
+    /** @var Collection<int, User> $users */
+    $users = User::all();
+
+    expect($users)->toBeInstanceOf(User::class)->sequence(
+        function ($user, $key) {
+            // $user is Expectation<User>, $key is Expectation<int>
+            $user->name->toBeString();
+        },
+    );
+});
+```
+
+## Scoped closure typing
+
+`expectationScopedTypes: true` (default) types the callback parameter in `->scoped()` based on the higher-order property type:
+
+```php
+it('types scoped callbacks', function () {
+    $user = new User;
+
+    expect($user)
+        ->address->toBeInstanceOf(Address::class)->scoped(function ($address) {
+            // $address is Expectation<Address>
+            $address->city->toBeString();
+            $address->zip->toBeString();
+        });
+});
+```
+
 ## Custom expectations
 
 Custom expectations registered via `expect()->extend()` are also supported:

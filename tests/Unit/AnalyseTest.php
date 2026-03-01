@@ -95,6 +95,14 @@ it('allows higher-order property access on expectations', function () {
         ->toBe(0);
 });
 
+it('types sequence callback parameters from iterable value type', function () use ($fixtureDir, $configFile) {
+    assertTypeInference("$fixtureDir/ExpectationSequence.php", [$configFile]);
+});
+
+it('types scoped callback parameter from higher-order property type', function () use ($fixtureDir, $configFile) {
+    assertTypeInference("$fixtureDir/ExpectationScoped.php", [$configFile]);
+});
+
 describe('uses() trait resolution', function () use ($fixtureDir, $configFile) {
     it('resolves trait methods from uses()', function () use ($fixtureDir, $configFile) {
         assertTypeInference("$fixtureDir/UsesResolution/UsesFunction.php", [$configFile]);
@@ -118,6 +126,10 @@ describe('uses() trait resolution', function () use ($fixtureDir, $configFile) {
 
     it('resolves trait methods from pest()->group()->extend()', function () use ($fixtureDir, $configFile) {
         assertTypeInference("$fixtureDir/UsesResolution/PestGroupExtend.php", [$configFile]);
+    });
+
+    it('resolves trait properties from pest()->uses()', function () use ($fixtureDir, $configFile) {
+        assertTypeInference("$fixtureDir/UsesResolution/TraitProperties.php", [$configFile]);
     });
 });
 
@@ -149,3 +161,11 @@ it('falls back gracefully when expectationPropertyAccess is disabled', function 
     expect($this->analyseFixture('ExpectationPropertyAccess.php', 'phpstan-test-no-property-access.neon')['exitCode'])
         ->toBe(1);
 });
+
+it('falls back gracefully when expectationSequenceTypes is disabled', function () {
+    expect($this->analyseFixture('ExpectationSequence.php', 'phpstan-test-no-sequence-types.neon')['exitCode'])
+        ->toBe(1);
+});
+
+// Note: no disabled-toggle test for scoped types — Pest's own HigherOrderExpectation::scoped()
+// phpdoc provides Closure(Expectation<TValue>): void, so PHPStan resolves the type natively.

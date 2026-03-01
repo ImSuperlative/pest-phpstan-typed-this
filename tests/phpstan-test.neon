@@ -8,3 +8,5 @@ parameters:
     pestPhpstanTypedThis:
         parsePestPropertyTags: true
         parsePhpDocProperties: true
+        expectationSequenceTypes: true
+        expectationScopedTypes: true

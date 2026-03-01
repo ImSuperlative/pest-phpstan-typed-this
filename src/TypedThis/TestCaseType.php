@@ -58,14 +58,14 @@ final class TestCaseType extends ObjectType
 
     public function hasProperty(string $propertyName): TrinaryLogic
     {
-        return isset($this->dynamicProperties[$propertyName])
+        return $this->knowsProperty($propertyName)
             ? TrinaryLogic::createYes()
             : parent::hasProperty($propertyName);
     }
 
     public function hasInstanceProperty(string $propertyName): TrinaryLogic
     {
-        return isset($this->dynamicProperties[$propertyName])
+        return $this->knowsProperty($propertyName)
             ? TrinaryLogic::createYes()
             : parent::hasInstanceProperty($propertyName);
     }
@@ -74,18 +74,28 @@ final class TestCaseType extends ObjectType
         string $propertyName,
         ClassMemberAccessAnswerer $scope,
     ): UnresolvedPropertyPrototypeReflection {
-        return isset($this->dynamicProperties[$propertyName])
-            ? $this->buildPropertyPrototype($propertyName)
-            : parent::getUnresolvedPropertyPrototype($propertyName, $scope);
+        $trait = $this->findTraitWithProperty($propertyName);
+
+        return match (true) {
+            isset($this->dynamicProperties[$propertyName]) => $this->buildPropertyPrototype($propertyName),
+            $trait instanceof ClassReflection => new ObjectType($trait->getName())
+                ->getUnresolvedPropertyPrototype($propertyName, $scope),
+            default => parent::getUnresolvedPropertyPrototype($propertyName, $scope),
+        };
     }
 
     public function getUnresolvedInstancePropertyPrototype(
         string $propertyName,
         ClassMemberAccessAnswerer $scope,
     ): UnresolvedPropertyPrototypeReflection {
-        return isset($this->dynamicProperties[$propertyName])
-            ? $this->buildPropertyPrototype($propertyName)
-            : parent::getUnresolvedInstancePropertyPrototype($propertyName, $scope);
+        $trait = $this->findTraitWithProperty($propertyName);
+
+        return match (true) {
+            isset($this->dynamicProperties[$propertyName]) => $this->buildPropertyPrototype($propertyName),
+            $trait instanceof ClassReflection => new ObjectType($trait->getName())
+                ->getUnresolvedInstancePropertyPrototype($propertyName, $scope),
+            default => parent::getUnresolvedInstancePropertyPrototype($propertyName, $scope),
+        };
     }
 
     public function hasMethod(string $methodName): TrinaryLogic
@@ -106,6 +116,20 @@ final class TestCaseType extends ObjectType
             : parent::getUnresolvedMethodPrototype($methodName, $scope);
 
         return new PestPublicUnresolvedMethodPrototype($prototype);
+    }
+
+    private function knowsProperty(string $propertyName): bool
+    {
+        return isset($this->dynamicProperties[$propertyName])
+            || $this->findTraitWithProperty($propertyName) instanceof ClassReflection;
+    }
+
+    private function findTraitWithProperty(string $propertyName): ?ClassReflection
+    {
+        return array_find(
+            $this->traits,
+            static fn (ClassReflection $trait) => $trait->hasInstanceProperty($propertyName),
+        );
     }
 
     private function findTraitWithMethod(string $methodName): ?ClassReflection

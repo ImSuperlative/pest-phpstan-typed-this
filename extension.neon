@@ -7,6 +7,8 @@ parametersSchema:
         parseUses: bool()
         parseParentUses: bool()
         expectationPropertyAccess: bool()
+        expectationSequenceTypes: bool()
+        expectationScopedTypes: bool()
         simplifyToBe: bool()
         simplifyToBeNull: bool()
         simplifyToBeEmpty: bool()
@@ -23,6 +25,8 @@ parameters:
         parseUses: true
         parseParentUses: true
         expectationPropertyAccess: true
+        expectationSequenceTypes: false
+        expectationScopedTypes: false
         # Rules
         simplifyToBe: true
         simplifyToBeNull: true
@@ -118,6 +122,12 @@ services:
             - phpstan.broker.dynamicMethodReturnTypeExtension
 
     -
+        class: ImSuperlative\PestPhpstanTypedThis\Expectation\SequenceClosureTypeExtension
+
+    -
+        class: ImSuperlative\PestPhpstanTypedThis\Expectation\ScopedClosureTypeExtension
+
+    -
         class: ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToBeBooleanRule
 
     -
@@ -147,3 +157,7 @@ conditionalTags:
         phpstan.broker.dynamicFunctionReturnTypeExtension: %pestPhpstanTypedThis.expectationPropertyAccess%
     ImSuperlative\PestPhpstanTypedThis\Expectation\PropertyExtension:
         phpstan.broker.propertiesClassReflectionExtension: %pestPhpstanTypedThis.expectationPropertyAccess%
+    ImSuperlative\PestPhpstanTypedThis\Expectation\SequenceClosureTypeExtension:
+        phpstan.methodParameterClosureTypeExtension: %pestPhpstanTypedThis.expectationSequenceTypes%
+    ImSuperlative\PestPhpstanTypedThis\Expectation\ScopedClosureTypeExtension:
+        phpstan.methodParameterClosureTypeExtension: %pestPhpstanTypedThis.expectationScopedTypes%
