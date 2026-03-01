@@ -64,8 +64,8 @@ final class PropertyExtension implements PropertiesClassReflectionExtension
     private function preserveHigherOrderTemplates(ClassReflection $classReflection): GenericObjectType
     {
         $templateTypeMap = $classReflection->getTemplateTypeMap();
-        $tOriginal = $templateTypeMap->getType('TOriginalValue') ?? new MixedType();
-        $tValue = $templateTypeMap->getType('TValue') ?? new MixedType();
+        $tOriginal = $templateTypeMap->getType('TOriginalValue') ?? new MixedType;
+        $tValue = $templateTypeMap->getType('TValue') ?? new MixedType;
 
         return new GenericObjectType(PestExpectationClasses::HIGHER_ORDER, [$tOriginal, $tValue]);
     }
@@ -73,7 +73,7 @@ final class PropertyExtension implements PropertiesClassReflectionExtension
     /** Expectation<TValue> → HigherOrderExpectation<Expectation<TValue>, TValue> */
     private function wrapExpectationInHigherOrder(ClassReflection $classReflection): GenericObjectType
     {
-        $tValue = $classReflection->getTemplateTypeMap()->getType('TValue') ?? new MixedType();
+        $tValue = $classReflection->getTemplateTypeMap()->getType('TValue') ?? new MixedType;
         $expectationType = new GenericObjectType(PestExpectationClasses::EXPECTATION, [$tValue]);
 
         return new GenericObjectType(PestExpectationClasses::HIGHER_ORDER, [$expectationType, $tValue]);

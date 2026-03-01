@@ -33,7 +33,7 @@ final class ExpectationType extends GenericObjectType
 
     public function describe(VerbosityLevel $level): string
     {
-        return 'Expectation<'.$this->valueType->describe($level).'>';
+        return 'Pest\Expectation<'.$this->valueType->describe($level).'>';
     }
 
     public function hasProperty(string $propertyName): TrinaryLogic
