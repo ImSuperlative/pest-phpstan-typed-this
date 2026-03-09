@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ImSuperlative\PestPhpstanTypedThis\Parser;
+namespace ImSuperlative\PhpstanPest\Parser;
 
-use ImSuperlative\PestPhpstanTypedThis\Parser\Concerns\FirstOccurrenceFilterTrait;
-use ImSuperlative\PestPhpstanTypedThis\Parser\Concerns\PhpDocExtractorTrait;
-use ImSuperlative\PestPhpstanTypedThis\Parser\Contracts\PropertyParserStrategy;
+use ImSuperlative\PhpstanPest\Parser\Concerns\FirstOccurrenceFilterTrait;
+use ImSuperlative\PhpstanPest\Parser\Concerns\PhpDocExtractorTrait;
+use ImSuperlative\PhpstanPest\Parser\Contracts\PropertyParserStrategy;
 use PhpParser\Node;
 use PHPStan\PhpDoc\PhpDocStringResolver;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocNode;

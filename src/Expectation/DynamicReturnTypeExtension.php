@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ImSuperlative\PestPhpstanTypedThis\Expectation;
+namespace ImSuperlative\PhpstanPest\Expectation;
 
-use ImSuperlative\PestPhpstanTypedThis\Reflection\PestDynamicMethodReflection;
+use ImSuperlative\PhpstanPest\Reflection\PestDynamicMethodReflection;
 use PhpParser\Node\Expr\MethodCall;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
@@ -23,6 +23,10 @@ use PHPStan\Type\Type;
  */
 final class DynamicReturnTypeExtension implements DynamicMethodReturnTypeExtension
 {
+    public function __construct(
+        private PestExpectationClasses $pestExpectationClasses,
+    ) {}
+
     public function getClass(): string
     {
         return PestExpectationClasses::EXPECTATION;
@@ -43,10 +47,11 @@ final class DynamicReturnTypeExtension implements DynamicMethodReturnTypeExtensi
         $valueType = $this->extractValueType($callerType);
         $methodName = $methodReflection->getName();
 
-        $resolvedType = $valueType instanceof Type
-            ? PestExpectationClasses::resolvePropertyType($valueType, $methodName)
-                ?? PestExpectationClasses::resolveMethodReturnType($valueType, $methodName)
-            : null;
+        if (! $valueType instanceof Type) {
+            return null;
+        }
+
+        $resolvedType = $this->pestExpectationClasses->resolveNarrowedType($valueType, $methodName);
 
         return $resolvedType instanceof Type
             ? $this->buildHigherOrderType($callerType, $resolvedType)

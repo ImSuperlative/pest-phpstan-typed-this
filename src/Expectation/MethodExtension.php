@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ImSuperlative\PestPhpstanTypedThis\Expectation;
+namespace ImSuperlative\PhpstanPest\Expectation;
 
-use ImSuperlative\PestPhpstanTypedThis\Reflection\PestDynamicMethodReflection;
+use ImSuperlative\PhpstanPest\Reflection\PestDynamicMethodReflection;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\MethodReflection;
 use PHPStan\Reflection\MethodsClassReflectionExtension;

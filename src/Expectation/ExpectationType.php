@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace ImSuperlative\PestPhpstanTypedThis\Expectation;
+namespace ImSuperlative\PhpstanPest\Expectation;
 
-use ImSuperlative\PestPhpstanTypedThis\Reflection\PestPropertyReflection;
-use ImSuperlative\PestPhpstanTypedThis\Reflection\PestUnresolvedPropertyPrototype;
+use ImSuperlative\PhpstanPest\Reflection\PestPropertyReflection;
+use ImSuperlative\PhpstanPest\Reflection\PestUnresolvedPropertyPrototype;
 use PHPStan\Reflection\ClassMemberAccessAnswerer;
 use PHPStan\Reflection\ReflectionProvider;
 use PHPStan\Reflection\Type\UnresolvedPropertyPrototypeReflection;
@@ -27,6 +27,7 @@ final class ExpectationType extends GenericObjectType
     public function __construct(
         private Type $valueType,
         private ReflectionProvider $reflectionProvider,
+        private PestExpectationClasses $pestExpectationClasses,
     ) {
         parent::__construct(PestExpectationClasses::EXPECTATION, [$valueType]);
     }
@@ -38,14 +39,14 @@ final class ExpectationType extends GenericObjectType
 
     public function hasProperty(string $propertyName): TrinaryLogic
     {
-        return $this->isValueProperty($propertyName)
+        return $this->resolveValuePropertyType($propertyName) instanceof Type
             ? TrinaryLogic::createYes()
             : parent::hasProperty($propertyName);
     }
 
     public function hasInstanceProperty(string $propertyName): TrinaryLogic
     {
-        return $this->isValueProperty($propertyName)
+        return $this->resolveValuePropertyType($propertyName) instanceof Type
             ? TrinaryLogic::createYes()
             : parent::hasInstanceProperty($propertyName);
     }
@@ -72,16 +73,15 @@ final class ExpectationType extends GenericObjectType
             : parent::getUnresolvedInstancePropertyPrototype($propertyName, $scope);
     }
 
-    private function isValueProperty(string $propertyName): bool
-    {
-        return $propertyName !== 'value' && $this->valueType->hasProperty($propertyName)->yes();
-    }
-
     private function resolveValuePropertyType(string $propertyName): ?Type
     {
-        return $propertyName !== 'value'
-            ? PestExpectationClasses::resolvePropertyType($this->valueType, $propertyName)
-            : null;
+        if ($propertyName === 'value') {
+            return null;
+        }
+
+        $narrowed = $this->pestExpectationClasses->narrowUnionForProperty($this->valueType, $propertyName);
+
+        return $this->pestExpectationClasses->resolvePropertyType($narrowed, $propertyName);
     }
 
     private function buildHigherOrderPropertyPrototype(Type $propertyType): UnresolvedPropertyPrototypeReflection

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ImSuperlative\PestPhpstanTypedThis\Expectation;
+namespace ImSuperlative\PhpstanPest\Expectation;
 
 use PhpParser\Node\Expr\MethodCall;
 use PHPStan\Analyser\Scope;
@@ -29,6 +29,7 @@ final class HigherOrderDynamicReturnTypeExtension implements DynamicMethodReturn
 
     public function __construct(
         private ReflectionProvider $reflectionProvider,
+        private PestExpectationClasses $pestExpectationClasses,
     ) {}
 
     public function getClass(): string
@@ -66,8 +67,7 @@ final class HigherOrderDynamicReturnTypeExtension implements DynamicMethodReturn
         $tValue = $callerType->getTemplateType(PestExpectationClasses::HIGHER_ORDER, 'TValue');
 
         $resolvedValue = $this->resolveAsExpectationMethod($methodName, $tValue)
-            ?? PestExpectationClasses::resolveMethodReturnType($tValue, $methodName)
-            ?? PestExpectationClasses::resolvePropertyType($tValue, $methodName)
+            ?? $this->pestExpectationClasses->resolveNarrowedType($tValue, $methodName)
             ?? new MixedType;
 
         return new GenericObjectType(PestExpectationClasses::HIGHER_ORDER, [$tOriginal, $resolvedValue]);

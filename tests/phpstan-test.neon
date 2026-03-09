@@ -5,7 +5,7 @@ parameters:
     level: 8
     paths:
         - Unit
-    pestPhpstanTypedThis:
+    PhpstanPest:
         parsePestPropertyTags: true
         parsePhpDocProperties: true
         expectationSequenceTypes: true

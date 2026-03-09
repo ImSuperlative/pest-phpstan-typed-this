@@ -40,9 +40,34 @@ expect(['a' => 1])->toBeArray()
     ->toHaveKey('a');
 ```
 
+## Union type narrowing
+
+When `expect()` receives a union type, property and method access automatically narrows the union to only members that have the accessed member. If no members match, it falls back to the original type so PHPStan reports the error normally.
+
+```php
+it('narrows union types on property access', function () {
+    /** @var Order|Order[]|Collection|null $order */
+    $order = Order::factory()->create();
+
+    expect($order)
+        ->id->toBeInt()          // ->id narrows to Order (only Order has id)
+        ->status->toBeString();  // chained access continues on Order
+});
+
+it('narrows union types on method access', function () {
+    /** @var Order|Order[]|null $order */
+    $order = Order::factory()->create();
+
+    expect($order)
+        ->getItems()->toHaveCount(3);  // ->getItems() narrows to Order
+});
+```
+
+This works with any union type, including nullable types (`Order|null`), intersection-in-union types (`(Order&HasFactory)|Collection`), and array unions (`Order|Order[]`). The narrowing delegates to PHPStan's own `hasProperty()`/`hasMethod()` per union member, so it respects stubs, PHPDocs, and extensions like Larastan.
+
 ## Sequence closure typing
 
-`expectationSequenceTypes: true` (default) types the callback parameters in `->sequence()` based on the iterable value type:
+`expectationSequenceTypes: true` (disabled by default) types the callback parameters in `->sequence()` based on the iterable value type:
 
 ```php
 use Illuminate\Support\Collection;
@@ -62,7 +87,7 @@ it('types sequence callbacks', function () {
 
 ## Scoped closure typing
 
-`expectationScopedTypes: true` (default) types the callback parameter in `->scoped()` based on the higher-order property type:
+`expectationScopedTypes: true` (disabled by default) types the callback parameter in `->scoped()` based on the higher-order property type:
 
 ```php
 it('types scoped callbacks', function () {

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ImSuperlative\PestPhpstanTypedThis\Expectation;
+namespace ImSuperlative\PhpstanPest\Expectation;
 
-use ImSuperlative\PestPhpstanTypedThis\Reflection\SimpleParameterReflection;
+use ImSuperlative\PhpstanPest\Reflection\SimpleParameterReflection;
 use PhpParser\Node\Expr\MethodCall;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
@@ -20,6 +20,7 @@ final class ScopedClosureTypeExtension implements MethodParameterClosureTypeExte
 {
     public function __construct(
         private ReflectionProvider $reflectionProvider,
+        private PestExpectationClasses $pestExpectationClasses,
     ) {}
 
     public function isMethodSupported(MethodReflection $methodReflection, ParameterReflection $parameter): bool
@@ -38,7 +39,7 @@ final class ScopedClosureTypeExtension implements MethodParameterClosureTypeExte
 
         return $tValue !== null
             ? new ClosureType(
-                [new SimpleParameterReflection('expectation', new ExpectationType($tValue, $this->reflectionProvider))],
+                [new SimpleParameterReflection('expectation', new ExpectationType($tValue, $this->reflectionProvider, $this->pestExpectationClasses))],
                 new VoidType,
             )
             : null;

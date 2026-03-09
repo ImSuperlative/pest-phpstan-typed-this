@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ImSuperlative\PestPhpstanTypedThis\Expectation;
+namespace ImSuperlative\PhpstanPest\Expectation;
 
 use PhpParser\Node\Expr\FuncCall;
 use PHPStan\Analyser\Scope;
@@ -20,6 +20,7 @@ final class ExpectFunctionReturnTypeExtension implements DynamicFunctionReturnTy
 {
     public function __construct(
         private ReflectionProvider $reflectionProvider,
+        private PestExpectationClasses $pestExpectationClasses,
     ) {}
 
     public function isFunctionSupported(FunctionReflection $functionReflection): bool
@@ -39,7 +40,8 @@ final class ExpectFunctionReturnTypeExtension implements DynamicFunctionReturnTy
 
         return new ExpectationType(
             $scope->getType($args[0]->value),
-            $this->reflectionProvider
+            $this->reflectionProvider,
+            $this->pestExpectationClasses,
         );
     }
 }

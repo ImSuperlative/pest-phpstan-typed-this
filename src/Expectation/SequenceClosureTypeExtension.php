@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ImSuperlative\PestPhpstanTypedThis\Expectation;
+namespace ImSuperlative\PhpstanPest\Expectation;
 
-use ImSuperlative\PestPhpstanTypedThis\Reflection\SimpleParameterReflection;
+use ImSuperlative\PhpstanPest\Reflection\SimpleParameterReflection;
 use PhpParser\Node\Expr\MethodCall;
 use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
@@ -20,6 +20,7 @@ final class SequenceClosureTypeExtension implements MethodParameterClosureTypeEx
 {
     public function __construct(
         private ReflectionProvider $reflectionProvider,
+        private PestExpectationClasses $pestExpectationClasses,
     ) {}
 
     public function isMethodSupported(MethodReflection $methodReflection, ParameterReflection $parameter): bool
@@ -70,7 +71,7 @@ final class SequenceClosureTypeExtension implements MethodParameterClosureTypeEx
 
     private function wrapInExpectation(Type $type): ExpectationType
     {
-        return new ExpectationType($type, $this->reflectionProvider);
+        return new ExpectationType($type, $this->reflectionProvider, $this->pestExpectationClasses);
     }
 
     private function buildSequenceClosureType(Type $iterableValueType, Type $iterableKeyType): ClosureType

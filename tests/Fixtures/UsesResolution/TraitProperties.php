@@ -1,7 +1,7 @@
 <?php
 
-use ImSuperlative\PestPhpstanTypedThis\Tests\Fixtures\Concerns\HasTeamSetup;
-use ImSuperlative\PestPhpstanTypedThis\Tests\Fixtures\Models\Form;
+use ImSuperlative\PhpstanPest\Tests\Fixtures\Concerns\HasTeamSetup;
+use ImSuperlative\PhpstanPest\Tests\Fixtures\Models\Form;
 use function PHPStan\Testing\assertType;
 
 pest()->uses(HasTeamSetup::class);

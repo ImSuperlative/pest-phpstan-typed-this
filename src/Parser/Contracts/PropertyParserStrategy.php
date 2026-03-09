@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ImSuperlative\PestPhpstanTypedThis\Parser\Contracts;
+namespace ImSuperlative\PhpstanPest\Parser\Contracts;
 
 use PhpParser\Node;
 use PHPStan\Type\Type;

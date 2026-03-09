@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ImSuperlative\PestPhpstanTypedThis\Parser;
+namespace ImSuperlative\PhpstanPest\Parser;
 
 use PhpParser\Node\Expr;
 use PhpParser\Node\Identifier;
-use ImSuperlative\PestPhpstanTypedThis\Parser\Concerns\FirstOccurrenceFilterTrait;
-use ImSuperlative\PestPhpstanTypedThis\Parser\Contracts\PropertyParserStrategy;
+use ImSuperlative\PhpstanPest\Parser\Concerns\FirstOccurrenceFilterTrait;
+use ImSuperlative\PhpstanPest\Parser\Contracts\PropertyParserStrategy;
 use PhpParser\Node;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\PropertyFetch;

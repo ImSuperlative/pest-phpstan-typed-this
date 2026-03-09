@@ -1,6 +1,6 @@
 <?php
 
-namespace ImSuperlative\PestPhpstanTypedThis\Tests;
+namespace ImSuperlative\PhpstanPest\Tests;
 
 use Orchestra\Testbench\TestCase as BaseTestCase;
 

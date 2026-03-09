@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ImSuperlative\PestPhpstanTypedThis\Reflection;
+namespace ImSuperlative\PhpstanPest\Reflection;
 
 use PHPStan\Reflection\ParameterReflection;
 use PHPStan\Reflection\PassedByReference;

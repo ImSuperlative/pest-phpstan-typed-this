@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ImSuperlative\PestPhpstanTypedThis\TypedThis;
+namespace ImSuperlative\PhpstanPest\TypedThis;
 
-use ImSuperlative\PestPhpstanTypedThis\Reflection\PestPropertyReflection;
-use ImSuperlative\PestPhpstanTypedThis\Reflection\PestPublicUnresolvedMethodPrototype;
-use ImSuperlative\PestPhpstanTypedThis\Reflection\PestUnresolvedPropertyPrototype;
+use ImSuperlative\PhpstanPest\Reflection\PestPropertyReflection;
+use ImSuperlative\PhpstanPest\Reflection\PestPublicUnresolvedMethodPrototype;
+use ImSuperlative\PhpstanPest\Reflection\PestUnresolvedPropertyPrototype;
 use PHPStan\Reflection\ClassMemberAccessAnswerer;
 use PHPStan\Reflection\ClassReflection;
 use PHPStan\Reflection\ReflectionProvider;

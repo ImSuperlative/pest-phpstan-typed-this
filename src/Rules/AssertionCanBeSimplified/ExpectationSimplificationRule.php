@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified;
+namespace ImSuperlative\PhpstanPest\Rules\AssertionCanBeSimplified;
 
+use Pest\Expectation;
 use PhpParser\Node;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Identifier;
-use Pest\Expectation;
 use PHPStan\Analyser\Scope;
 use PHPStan\Rules\IdentifierRuleError;
 use PHPStan\Rules\Rule;
@@ -85,7 +85,7 @@ abstract class ExpectationSimplificationRule implements Rule
         $replacement = $this->getReplacement($arg);
         /** @var Identifier $name */
         $name = $node->name;
-        $original = $name->name . '(' . $this->describeArgument($arg) . ')';
+        $original = $name->name.'('.$this->describeArgument($arg).')';
 
         /** @var IdentifierRuleError */
         return RuleErrorBuilder::message(

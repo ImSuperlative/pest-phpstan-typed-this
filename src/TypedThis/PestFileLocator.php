@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ImSuperlative\PestPhpstanTypedThis\TypedThis;
+namespace ImSuperlative\PhpstanPest\TypedThis;
 
 /**
  * Locates parent Pest.php files for a given test file path.

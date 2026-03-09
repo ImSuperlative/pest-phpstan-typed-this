@@ -1,6 +1,6 @@
 <?php
 
-use ImSuperlative\PestPhpstanTypedThis\Tests\Fixtures\Models\Attendee;
+use ImSuperlative\PhpstanPest\Tests\Fixtures\Models\Attendee;
 
 it('allows higher-order property access on expectations', function () {
     $attendee = new Attendee();

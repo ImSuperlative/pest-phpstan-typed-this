@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ImSuperlative\PestPhpstanTypedThis\Parser\Concerns;
+namespace ImSuperlative\PhpstanPest\Parser\Concerns;
 
 trait FirstOccurrenceFilterTrait
 {

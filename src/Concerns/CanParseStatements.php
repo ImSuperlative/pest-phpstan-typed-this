@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ImSuperlative\PestPhpstanTypedThis\Concerns;
+namespace ImSuperlative\PhpstanPest\Concerns;
 
 use PhpParser\Node;
 use PhpParser\NodeTraverser;

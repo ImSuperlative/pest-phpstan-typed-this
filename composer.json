@@ -1,5 +1,5 @@
 {
-    "name": "imsuperlative/pest-phpstan-typed-this",
+    "name": "imsuperlative/phpstan-pest",
     "description": "PHPStan extension that types $this in Pest PHP test closures",
     "type": "phpstan-extension",
     "license": "MIT",
@@ -15,12 +15,12 @@
     },
     "autoload": {
         "psr-4": {
-            "ImSuperlative\\PestPhpstanTypedThis\\": "src/"
+            "ImSuperlative\\PhpstanPest\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "ImSuperlative\\PestPhpstanTypedThis\\Tests\\": "tests/"
+            "ImSuperlative\\PhpstanPest\\Tests\\": "tests/"
         }
     },
     "scripts": {

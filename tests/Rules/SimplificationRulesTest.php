@@ -1,11 +1,11 @@
 <?php
 
-use ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToBeBooleanRule;
-use ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToBeEmptyRule;
-use ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToBeNullRule;
-use ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToHaveCountZeroRule;
-use ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToHaveLengthZeroRule;
-use ImSuperlative\PestPhpstanTypedThis\Tests\ConfigurableRuleTestCase;
+use ImSuperlative\PhpstanPest\Rules\AssertionCanBeSimplified\ToBeBooleanRule;
+use ImSuperlative\PhpstanPest\Rules\AssertionCanBeSimplified\ToBeEmptyRule;
+use ImSuperlative\PhpstanPest\Rules\AssertionCanBeSimplified\ToBeNullRule;
+use ImSuperlative\PhpstanPest\Rules\AssertionCanBeSimplified\ToHaveCountZeroRule;
+use ImSuperlative\PhpstanPest\Rules\AssertionCanBeSimplified\ToHaveLengthZeroRule;
+use ImSuperlative\PhpstanPest\Tests\ConfigurableRuleTestCase;
 
 describe('ToBeBooleanRule', function () {
     beforeEach(fn () => ConfigurableRuleTestCase::useRule(new ToBeBooleanRule));

@@ -3,7 +3,7 @@
 /** @noinspection MultipleExpectChainableInspection */
 
 use Illuminate\Support\Collection;
-use ImSuperlative\PestPhpstanTypedThis\Tests\Fixtures\Models\Attendee;
+use ImSuperlative\PhpstanPest\Tests\Fixtures\Models\Attendee;
 use Pest\Expectation;
 
 use function PHPStan\Testing\assertType;
@@ -17,7 +17,7 @@ it('types sequence callback parameters from iterable value type', function () {
         function (Expectation $first) {
             $first->id->toBeInt();
             /** @noinspection PhpExpressionResultUnusedInspection */
-            assertType('Pest\Expectation<ImSuperlative\PestPhpstanTypedThis\Tests\Fixtures\Models\Attendee>', $first);
+            assertType('Pest\Expectation<ImSuperlative\PhpstanPest\Tests\Fixtures\Models\Attendee>', $first);
         },
     );
 
@@ -27,7 +27,7 @@ it('types sequence callback parameters from iterable value type', function () {
             // first isnt typed either
             $first->id->toBeString();
             /** @noinspection PhpExpressionResultUnusedInspection */
-            assertType('Pest\Expectation<ImSuperlative\PestPhpstanTypedThis\Tests\Fixtures\Models\Attendee>', $first);
+            assertType('Pest\Expectation<ImSuperlative\PhpstanPest\Tests\Fixtures\Models\Attendee>', $first);
         },
     );
 });

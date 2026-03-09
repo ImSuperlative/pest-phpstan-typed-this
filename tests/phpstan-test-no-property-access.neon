@@ -2,5 +2,5 @@ includes:
     - phpstan-test.neon
 
 parameters:
-    pestPhpstanTypedThis:
+    PhpstanPest:
         expectationPropertyAccess: false

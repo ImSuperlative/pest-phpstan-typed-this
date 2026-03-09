@@ -2,8 +2,8 @@
 
 /** @noinspection StaticClosureCanBeUsedInspection */
 
-use ImSuperlative\PestPhpstanTypedThis\Tests\AnalysesFixtures;
-use ImSuperlative\PestPhpstanTypedThis\Tests\TypeInferenceTestCase;
+use ImSuperlative\PhpstanPest\Tests\AnalysesFixtures;
+use ImSuperlative\PhpstanPest\Tests\TypeInferenceTestCase;
 
 uses(AnalysesFixtures::class);
 
@@ -92,6 +92,11 @@ it('allows dynamic methods on Pest Expectation', function () {
 
 it('allows higher-order property access on expectations', function () {
     expect($this->analyseFixture('ExpectationPropertyAccess.php')['exitCode'])
+        ->toBe(0);
+});
+
+it('narrows union types when accessing properties on expectations', function () {
+    expect($this->analyseFixture('ExpectationUnionNarrowing.php')['exitCode'])
         ->toBe(0);
 });
 

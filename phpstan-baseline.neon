@@ -25,25 +25,25 @@ parameters:
 			path: src/Reflection/PestPublicExtendedMethodReflection.php
 
 		-
-			message: '#^Method ImSuperlative\\PestPhpstanTypedThis\\Reflection\\PestPublicExtendedMethodReflection\:\:getAttributes\(\) should return list\<PHPStan\\BetterReflection\\Reflection\\ReflectionAttribute\> but returns list\<PHPStan\\Reflection\\AttributeReflection\>\.$#'
+			message: '#^Method ImSuperlative\\PhpstanPest\\Reflection\\PestPublicExtendedMethodReflection\:\:getAttributes\(\) should return list\<PHPStan\\BetterReflection\\Reflection\\ReflectionAttribute\> but returns list\<PHPStan\\Reflection\\AttributeReflection\>\.$#'
 			identifier: return.type
 			count: 1
 			path: src/Reflection/PestPublicExtendedMethodReflection.php
 
 		-
-			message: '#^Method ImSuperlative\\PestPhpstanTypedThis\\Reflection\\PestPublicExtendedMethodReflection\:\:isAbstract\(\) should return PHPStan\\TrinaryLogic but returns bool\|PHPStan\\TrinaryLogic\.$#'
+			message: '#^Method ImSuperlative\\PhpstanPest\\Reflection\\PestPublicExtendedMethodReflection\:\:isAbstract\(\) should return PHPStan\\TrinaryLogic but returns bool\|PHPStan\\TrinaryLogic\.$#'
 			identifier: return.type
 			count: 1
 			path: src/Reflection/PestPublicExtendedMethodReflection.php
 
 		-
-			message: '#^Method ImSuperlative\\PestPhpstanTypedThis\\Reflection\\PestPublicExtendedMethodReflection\:\:isBuiltin\(\) should return PHPStan\\TrinaryLogic but returns bool\|PHPStan\\TrinaryLogic\.$#'
+			message: '#^Method ImSuperlative\\PhpstanPest\\Reflection\\PestPublicExtendedMethodReflection\:\:isBuiltin\(\) should return PHPStan\\TrinaryLogic but returns bool\|PHPStan\\TrinaryLogic\.$#'
 			identifier: return.type
 			count: 1
 			path: src/Reflection/PestPublicExtendedMethodReflection.php
 
 		-
-			message: '#^Return type \(list\<PHPStan\\BetterReflection\\Reflection\\ReflectionAttribute\>\) of method ImSuperlative\\PestPhpstanTypedThis\\Reflection\\PestPublicExtendedMethodReflection\:\:getAttributes\(\) should be compatible with return type \(list\<PHPStan\\Reflection\\AttributeReflection\>\) of method PHPStan\\Reflection\\ExtendedMethodReflection\:\:getAttributes\(\)$#'
+			message: '#^Return type \(list\<PHPStan\\BetterReflection\\Reflection\\ReflectionAttribute\>\) of method ImSuperlative\\PhpstanPest\\Reflection\\PestPublicExtendedMethodReflection\:\:getAttributes\(\) should be compatible with return type \(list\<PHPStan\\Reflection\\AttributeReflection\>\) of method PHPStan\\Reflection\\ExtendedMethodReflection\:\:getAttributes\(\)$#'
 			identifier: method.childReturnType
 			count: 1
 			path: src/Reflection/PestPublicExtendedMethodReflection.php

@@ -28,7 +28,7 @@ includes:
 
 ```neon
 parameters:
-    pestPhpstanTypedThis:
+    PhpstanPest:
         testCaseClass: PHPUnit\Framework\TestCase  # Base test case class
         parseAssignments: true                     # $this->prop = expr inference
         parsePestPropertyTags: false               # @pest-property tags
@@ -38,18 +38,18 @@ parameters:
         expectationPropertyAccess: true            # Higher-order property access on expect()
         expectationSequenceTypes: false            # Typed closures in ->sequence()
         expectationScopedTypes: false              # Typed closures in ->scoped()
-        simplifyToBe: true                        # ->toBe(true/false) → ->toBeTrue/False()
-        simplifyToBeNull: true                    # ->toBe(null) → ->toBeNull()
-        simplifyToBeEmpty: true                   # ->toBe('')/->toBe([]) → ->toBeEmpty()
-        simplifyToHaveCount: true                 # ->toHaveCount(0) → ->toBeEmpty()
-        simplifyToHaveLength: true                # ->toHaveLength(0) → ->toBeEmpty()
+        simplifyToBe: true                         # ->toBe(true/false) → ->toBeTrue/False()
+        simplifyToBeNull: true                     # ->toBe(null) → ->toBeNull()
+        simplifyToBeEmpty: true                    # ->toBe('')/->toBe([]) → ->toBeEmpty()
+        simplifyToHaveCount: true                  # ->toHaveCount(0) → ->toBeEmpty()
+        simplifyToHaveLength: true                 # ->toHaveLength(0) → ->toBeEmpty()
 ```
 
 If your project extends the base TestCase (e.g. in Laravel with Testbench), point `testCaseClass` to your own class:
 
 ```neon
 parameters:
-    pestPhpstanTypedThis:
+    PhpstanPest:
         testCaseClass: Tests\TestCase
 ```
 
@@ -92,7 +92,7 @@ it('can call trait methods', function () {
 
 ### Expectations
 
-Higher-order method proxying, property access on `expect()`, and custom expectations:
+Higher-order method proxying, property access on `expect()`, union type narrowing, and custom expectations:
 
 ```php
 it('proxies and accesses properties', function () {
@@ -100,6 +100,16 @@ it('proxies and accesses properties', function () {
         ->name->toBe('Test');
 
     expect(collect([1, 2, 3]))->first()->toBe(1);
+});
+
+// Union types are automatically narrowed to members that have the accessed property/method
+it('narrows union types', function () {
+    /** @var Order|Order[]|null $order */
+    $order = Order::factory()->create();
+
+    expect($order)
+        ->id->toBeInt()          // narrows to Order (only Order has ->id)
+        ->status->toBeString();
 });
 ```
 

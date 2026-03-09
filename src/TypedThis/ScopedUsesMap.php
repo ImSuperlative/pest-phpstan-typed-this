@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ImSuperlative\PestPhpstanTypedThis\TypedThis;
+namespace ImSuperlative\PhpstanPest\TypedThis;
 
 /**
  * Immutable map of ->in() scoped class declarations from a Pest.php file.

@@ -1,6 +1,6 @@
 <?php
 
-use ImSuperlative\PestPhpstanTypedThis\Tests\Fixtures\Concerns\HasGreeting;
+use ImSuperlative\PhpstanPest\Tests\Fixtures\Concerns\HasGreeting;
 use function PHPStan\Testing\assertType;
 
 pest()->extend(HasGreeting::class);

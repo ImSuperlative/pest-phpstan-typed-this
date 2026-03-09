@@ -1,8 +1,8 @@
 <?php
 
-namespace ImSuperlative\PestPhpstanTypedThis\Tests\Fixtures\Concerns;
+namespace ImSuperlative\PhpstanPest\Tests\Fixtures\Concerns;
 
-use ImSuperlative\PestPhpstanTypedThis\Tests\Fixtures\Models\Form;
+use ImSuperlative\PhpstanPest\Tests\Fixtures\Models\Form;
 
 trait HasTeamSetup
 {

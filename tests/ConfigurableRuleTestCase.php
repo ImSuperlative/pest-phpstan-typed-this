@@ -1,6 +1,6 @@
 <?php
 
-namespace ImSuperlative\PestPhpstanTypedThis\Tests;
+namespace ImSuperlative\PhpstanPest\Tests;
 
 use PHPStan\Rules\Rule;
 use PHPStan\Testing\RuleTestCase;

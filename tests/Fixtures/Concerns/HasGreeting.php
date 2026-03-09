@@ -1,6 +1,6 @@
 <?php
 
-namespace ImSuperlative\PestPhpstanTypedThis\Tests\Fixtures\Concerns;
+namespace ImSuperlative\PhpstanPest\Tests\Fixtures\Concerns;
 
 trait HasGreeting
 {

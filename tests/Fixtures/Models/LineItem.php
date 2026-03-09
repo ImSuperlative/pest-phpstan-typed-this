@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace ImSuperlative\PhpstanPest\Tests\Fixtures\Models;
 
-class Form
+class LineItem
 {
-    public int $id = 2;
-    public string $title = 'Registration';
+    public int $quantity = 1;
+    public float $price = 9.99;
 }

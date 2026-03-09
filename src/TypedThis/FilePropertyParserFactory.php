@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace ImSuperlative\PestPhpstanTypedThis\TypedThis;
+namespace ImSuperlative\PhpstanPest\TypedThis;
 
-use ImSuperlative\PestPhpstanTypedThis\Parser\AssignmentInferenceParser;
-use ImSuperlative\PestPhpstanTypedThis\Parser\PestPropertyTagParser;
-use ImSuperlative\PestPhpstanTypedThis\Parser\PhpDocPropertyParser;
+use ImSuperlative\PhpstanPest\Parser\AssignmentInferenceParser;
+use ImSuperlative\PhpstanPest\Parser\PestPropertyTagParser;
+use ImSuperlative\PhpstanPest\Parser\PhpDocPropertyParser;
 use PhpParser\NodeFinder;
 use PhpParser\Parser;
 

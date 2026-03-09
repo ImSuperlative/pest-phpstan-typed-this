@@ -1,10 +1,10 @@
 <?php
 
-use ImSuperlative\PestPhpstanTypedThis\Tests\ConfigurableRuleTestCase;
-use ImSuperlative\PestPhpstanTypedThis\Tests\Fixtures\Concerns\HasGreeting;
-use ImSuperlative\PestPhpstanTypedThis\Tests\Fixtures\Concerns\HasSubGreeting;
-use ImSuperlative\PestPhpstanTypedThis\Tests\TestCase;
-use ImSuperlative\PestPhpstanTypedThis\Tests\TypeInferenceTestCase;
+use ImSuperlative\PhpstanPest\Tests\ConfigurableRuleTestCase;
+use ImSuperlative\PhpstanPest\Tests\Fixtures\Concerns\HasGreeting;
+use ImSuperlative\PhpstanPest\Tests\Fixtures\Concerns\HasSubGreeting;
+use ImSuperlative\PhpstanPest\Tests\TestCase;
+use ImSuperlative\PhpstanPest\Tests\TypeInferenceTestCase;
 
 pest()->extend(TypeInferenceTestCase::class)
     ->in('Unit');

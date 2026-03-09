@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ImSuperlative\PestPhpstanTypedThis\Tests\Fixtures\Models;
+namespace ImSuperlative\PhpstanPest\Tests\Fixtures\Models;
 
 class Attendee
 {

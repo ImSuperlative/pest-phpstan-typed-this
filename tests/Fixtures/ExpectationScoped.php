@@ -2,8 +2,8 @@
 
 /** @noinspection MultipleExpectChainableInspection */
 
-use ImSuperlative\PestPhpstanTypedThis\Tests\Fixtures\Models\Attendee;
-use ImSuperlative\PestPhpstanTypedThis\Tests\Fixtures\Models\Form;
+use ImSuperlative\PhpstanPest\Tests\Fixtures\Models\Attendee;
+use ImSuperlative\PhpstanPest\Tests\Fixtures\Models\Form;
 use Pest\Expectation;
 
 use function PHPStan\Testing\assertType;
@@ -36,6 +36,6 @@ it('types scoped callback on form property', function () {
     expect($attendee)
         ->form->scoped(function ($form) {
             /** @noinspection PhpExpressionResultUnusedInspection */
-            assertType('Pest\Expectation<ImSuperlative\PestPhpstanTypedThis\Tests\Fixtures\Models\Form>', $form);
+            assertType('Pest\Expectation<ImSuperlative\PhpstanPest\Tests\Fixtures\Models\Form>', $form);
         });
 });

@@ -2,7 +2,7 @@
 
 /** @noinspection MultipleExpectChainableInspection */
 
-use ImSuperlative\PestPhpstanTypedThis\Tests\Fixtures\Models\Attendee;
+use ImSuperlative\PhpstanPest\Tests\Fixtures\Models\Attendee;
 
 it('chains property access on expectations', function () {
     $result = new Attendee();

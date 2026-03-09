@@ -1,5 +1,5 @@
 parametersSchema:
-    pestPhpstanTypedThis: structure([
+    PhpstanPest: structure([
         testCaseClass: string()
         parsePestPropertyTags: bool()
         parsePhpDocProperties: bool()
@@ -17,7 +17,7 @@ parametersSchema:
     ])
 
 parameters:
-    pestPhpstanTypedThis:
+    PhpstanPest:
         testCaseClass: PHPUnit\Framework\TestCase
         parsePestPropertyTags: false
         parsePhpDocProperties: false
@@ -49,115 +49,118 @@ services:
         class: PhpParser\NodeFinder
 
     -
-        class: ImSuperlative\PestPhpstanTypedThis\TypedThis\PestFileLocator
+        class: ImSuperlative\PhpstanPest\TypedThis\PestFileLocator
         arguments:
             currentWorkingDirectory: %currentWorkingDirectory%
 
     -
-        class: ImSuperlative\PestPhpstanTypedThis\TypedThis\PestFileCacheMetaExtension
+        class: ImSuperlative\PhpstanPest\TypedThis\PestFileCacheMetaExtension
         arguments:
             currentWorkingDirectory: %currentWorkingDirectory%
         tags:
             - phpstan.resultCacheMetaExtension
 
     -
-        class: ImSuperlative\PestPhpstanTypedThis\TypedThis\UsesParser
+        class: ImSuperlative\PhpstanPest\TypedThis\UsesParser
 
     -
-        class: ImSuperlative\PestPhpstanTypedThis\Parser\TypeStringParser
+        class: ImSuperlative\PhpstanPest\Parser\TypeStringParser
 
     -
-        class: ImSuperlative\PestPhpstanTypedThis\Parser\TypeResolver
+        class: ImSuperlative\PhpstanPest\Parser\TypeResolver
 
     -
-        class: ImSuperlative\PestPhpstanTypedThis\Parser\PestPropertyTagParser
+        class: ImSuperlative\PhpstanPest\Parser\PestPropertyTagParser
 
     -
-        class: ImSuperlative\PestPhpstanTypedThis\Parser\PhpDocPropertyParser
+        class: ImSuperlative\PhpstanPest\Parser\PhpDocPropertyParser
 
     -
-        class: ImSuperlative\PestPhpstanTypedThis\Parser\AssignmentInferenceParser
+        class: ImSuperlative\PhpstanPest\Parser\AssignmentInferenceParser
         arguments:
-            testCaseClass: %pestPhpstanTypedThis.testCaseClass%
+            testCaseClass: %PhpstanPest.testCaseClass%
 
     pestFilePropertyParserFactory:
-        class: ImSuperlative\PestPhpstanTypedThis\TypedThis\FilePropertyParserFactory
+        class: ImSuperlative\PhpstanPest\TypedThis\FilePropertyParserFactory
         arguments:
-            parsePestPropertyTags: %pestPhpstanTypedThis.parsePestPropertyTags%
-            parsePhpDocProperties: %pestPhpstanTypedThis.parsePhpDocProperties%
-            parseAssignments: %pestPhpstanTypedThis.parseAssignments%
+            parsePestPropertyTags: %PhpstanPest.parsePestPropertyTags%
+            parsePhpDocProperties: %PhpstanPest.parsePhpDocProperties%
+            parseAssignments: %PhpstanPest.parseAssignments%
 
     -
-        class: ImSuperlative\PestPhpstanTypedThis\TypedThis\FilePropertyParser
+        class: ImSuperlative\PhpstanPest\TypedThis\FilePropertyParser
         factory: @pestFilePropertyParserFactory::create
 
     -
-        class: ImSuperlative\PestPhpstanTypedThis\TypedThis\ClosureThisExtension
+        class: ImSuperlative\PhpstanPest\TypedThis\ClosureThisExtension
         arguments:
-            testCaseClass: %pestPhpstanTypedThis.testCaseClass%
-            parseUses: %pestPhpstanTypedThis.parseUses%
-            parseParentUses: %pestPhpstanTypedThis.parseParentUses%
+            testCaseClass: %PhpstanPest.testCaseClass%
+            parseUses: %PhpstanPest.parseUses%
+            parseParentUses: %PhpstanPest.parseParentUses%
         tags:
             - phpstan.functionParameterClosureThisExtension
 
+    -
+        class: ImSuperlative\PhpstanPest\Expectation\PestExpectationClasses
+
     pestExpectFunctionReturnType:
-        class: ImSuperlative\PestPhpstanTypedThis\Expectation\ExpectFunctionReturnTypeExtension
+        class: ImSuperlative\PhpstanPest\Expectation\ExpectFunctionReturnTypeExtension
 
     -
-        class: ImSuperlative\PestPhpstanTypedThis\Expectation\MethodExtension
+        class: ImSuperlative\PhpstanPest\Expectation\MethodExtension
         tags:
             - phpstan.broker.methodsClassReflectionExtension
 
     pestExpectationPropertyExtension:
-        class: ImSuperlative\PestPhpstanTypedThis\Expectation\PropertyExtension
+        class: ImSuperlative\PhpstanPest\Expectation\PropertyExtension
 
     -
-        class: ImSuperlative\PestPhpstanTypedThis\Expectation\DynamicReturnTypeExtension
+        class: ImSuperlative\PhpstanPest\Expectation\DynamicReturnTypeExtension
         tags:
             - phpstan.broker.dynamicMethodReturnTypeExtension
 
     -
-        class: ImSuperlative\PestPhpstanTypedThis\Expectation\HigherOrderDynamicReturnTypeExtension
+        class: ImSuperlative\PhpstanPest\Expectation\HigherOrderDynamicReturnTypeExtension
         tags:
             - phpstan.broker.dynamicMethodReturnTypeExtension
 
     -
-        class: ImSuperlative\PestPhpstanTypedThis\Expectation\SequenceClosureTypeExtension
+        class: ImSuperlative\PhpstanPest\Expectation\SequenceClosureTypeExtension
 
     -
-        class: ImSuperlative\PestPhpstanTypedThis\Expectation\ScopedClosureTypeExtension
+        class: ImSuperlative\PhpstanPest\Expectation\ScopedClosureTypeExtension
 
     -
-        class: ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToBeBooleanRule
+        class: ImSuperlative\PhpstanPest\Rules\AssertionCanBeSimplified\ToBeBooleanRule
 
     -
-        class: ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToBeNullRule
+        class: ImSuperlative\PhpstanPest\Rules\AssertionCanBeSimplified\ToBeNullRule
 
     -
-        class: ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToHaveCountZeroRule
+        class: ImSuperlative\PhpstanPest\Rules\AssertionCanBeSimplified\ToHaveCountZeroRule
 
     -
-        class: ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToBeEmptyRule
+        class: ImSuperlative\PhpstanPest\Rules\AssertionCanBeSimplified\ToBeEmptyRule
 
     -
-        class: ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToHaveLengthZeroRule
+        class: ImSuperlative\PhpstanPest\Rules\AssertionCanBeSimplified\ToHaveLengthZeroRule
 
 conditionalTags:
-    ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToBeBooleanRule:
-        phpstan.rules.rule: %pestPhpstanTypedThis.simplifyToBe%
-    ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToBeNullRule:
-        phpstan.rules.rule: %pestPhpstanTypedThis.simplifyToBeNull%
-    ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToHaveCountZeroRule:
-        phpstan.rules.rule: %pestPhpstanTypedThis.simplifyToHaveCount%
-    ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToBeEmptyRule:
-        phpstan.rules.rule: %pestPhpstanTypedThis.simplifyToBeEmpty%
-    ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified\ToHaveLengthZeroRule:
-        phpstan.rules.rule: %pestPhpstanTypedThis.simplifyToHaveLength%
-    ImSuperlative\PestPhpstanTypedThis\Expectation\ExpectFunctionReturnTypeExtension:
-        phpstan.broker.dynamicFunctionReturnTypeExtension: %pestPhpstanTypedThis.expectationPropertyAccess%
-    ImSuperlative\PestPhpstanTypedThis\Expectation\PropertyExtension:
-        phpstan.broker.propertiesClassReflectionExtension: %pestPhpstanTypedThis.expectationPropertyAccess%
-    ImSuperlative\PestPhpstanTypedThis\Expectation\SequenceClosureTypeExtension:
-        phpstan.methodParameterClosureTypeExtension: %pestPhpstanTypedThis.expectationSequenceTypes%
-    ImSuperlative\PestPhpstanTypedThis\Expectation\ScopedClosureTypeExtension:
-        phpstan.methodParameterClosureTypeExtension: %pestPhpstanTypedThis.expectationScopedTypes%
+    ImSuperlative\PhpstanPest\Rules\AssertionCanBeSimplified\ToBeBooleanRule:
+        phpstan.rules.rule: %PhpstanPest.simplifyToBe%
+    ImSuperlative\PhpstanPest\Rules\AssertionCanBeSimplified\ToBeNullRule:
+        phpstan.rules.rule: %PhpstanPest.simplifyToBeNull%
+    ImSuperlative\PhpstanPest\Rules\AssertionCanBeSimplified\ToHaveCountZeroRule:
+        phpstan.rules.rule: %PhpstanPest.simplifyToHaveCount%
+    ImSuperlative\PhpstanPest\Rules\AssertionCanBeSimplified\ToBeEmptyRule:
+        phpstan.rules.rule: %PhpstanPest.simplifyToBeEmpty%
+    ImSuperlative\PhpstanPest\Rules\AssertionCanBeSimplified\ToHaveLengthZeroRule:
+        phpstan.rules.rule: %PhpstanPest.simplifyToHaveLength%
+    ImSuperlative\PhpstanPest\Expectation\ExpectFunctionReturnTypeExtension:
+        phpstan.broker.dynamicFunctionReturnTypeExtension: %PhpstanPest.expectationPropertyAccess%
+    ImSuperlative\PhpstanPest\Expectation\PropertyExtension:
+        phpstan.broker.propertiesClassReflectionExtension: %PhpstanPest.expectationPropertyAccess%
+    ImSuperlative\PhpstanPest\Expectation\SequenceClosureTypeExtension:
+        phpstan.methodParameterClosureTypeExtension: %PhpstanPest.expectationSequenceTypes%
+    ImSuperlative\PhpstanPest\Expectation\ScopedClosureTypeExtension:
+        phpstan.methodParameterClosureTypeExtension: %PhpstanPest.expectationScopedTypes%

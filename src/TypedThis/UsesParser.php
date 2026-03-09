@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace ImSuperlative\PestPhpstanTypedThis\TypedThis;
+namespace ImSuperlative\PhpstanPest\TypedThis;
 
-use ImSuperlative\PestPhpstanTypedThis\Concerns\CanParseStatements;
+use ImSuperlative\PhpstanPest\Concerns\CanParseStatements;
 use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr;

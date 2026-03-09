@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace ImSuperlative\PestPhpstanTypedThis\Rules\AssertionCanBeSimplified;
+namespace ImSuperlative\PhpstanPest\Rules\AssertionCanBeSimplified;
 
 use PhpParser\Node;
 use PhpParser\Node\Scalar\Int_;
