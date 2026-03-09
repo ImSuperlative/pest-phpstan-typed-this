@@ -14,7 +14,7 @@ final readonly class PestFileCacheMetaExtension implements ResultCacheMetaExtens
 
     public function getKey(): string
     {
-        return 'pest-phpstan-typed-this-pest-files';
+        return 'phpstan-pest-files';
     }
 
     public function getHash(): string

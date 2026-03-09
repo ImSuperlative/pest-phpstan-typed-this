@@ -1,4 +1,4 @@
-# pest-phpstan-typed-this
+# phpstan-pest
 
 PHPStan extension that provides typed `$this` in Pest PHP test closures.
 
@@ -14,14 +14,14 @@ Solves the "undefined property" errors PHPStan reports when you assign dynamic p
 ## Installation
 
 ```bash
-composer require --dev imsuperlative/pest-phpstan-typed-this
+composer require --dev imsuperlative/phpstan-pest
 ```
 
 If you have `phpstan/extension-installer`, the extension is registered automatically. Otherwise, add it to your `phpstan.neon`:
 
 ```neon
 includes:
-    - vendor/imsuperlative/pest-phpstan-typed-this/extension.neon
+    - vendor/imsuperlative/phpstan-pest/extension.neon
 ```
 
 ## Configuration
